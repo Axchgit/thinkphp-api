@@ -2,8 +2,8 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-08-24 14:46:56
- * @LastEditors: xch
+ * @LastEditTime: 2020-09-09 10:46:43
+ * @LastEditors: 罗曼
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\config\database.php
  * @Description: 此为生产环境下的配置,开发环境配置在.env中
  */
@@ -31,7 +31,7 @@ return [
             // 服务器地址
             'hostname'          => env('database.hostname', '127.0.0.1'),
             // 数据库名
-            'database'          => env('database.database', 'ep_api'),
+            'database'          => env('database.database', 'party_api'),
             // 用户名
             'username'          => env('database.username', 'root'),
             // 密码

@@ -2,8 +2,8 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-09-04 02:33:12
- * @LastEditors: xch
+ * @LastEditTime: 2020-09-09 11:53:16
+ * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\route\app.php
  */
@@ -74,3 +74,9 @@ Route::group('goods', function () {
     Route::post('uploadExcel', 'uploadExcel')->middleware('checkrequest', 1)->allowCrossDomain();
     Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Goods/');
+
+
+Route::group('admin', function () {
+    Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
+    // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
+})->completeMatch()->prefix('Admin/');
