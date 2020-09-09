@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-09-09 11:52:56
+ * @LastEditTime: 2020-09-09 18:57:43
  * @LastEditors: 罗曼
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Employee.php
  * @Description: 
@@ -23,7 +23,8 @@ use think\facade\Db;
 
 class Admin extends Base
 {
-    public function importExcel(){
+    public function importExcel()
+    {
         $post =  request()->param();
         $person_model = new PersonModel();
         $res = $person_model->insertPerson($post);
@@ -32,6 +33,48 @@ class Admin extends Base
         } else {
             return $this->create($res, $res, 204);
         }
+    }
+
+    //员工查询个人推广商品
+    public function selectPerson()
+    {
+        $post =  request()->param();
+        // $res = $request->data;
+        $person_model = new PersonModel();
+        $key = !empty($post['key']) ? $post['key'] : '';
+        $value = !empty($post['value']) ? $post['value'] : '';
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $data = $person_model->selectPerson( $key, $value, $list_rows, false, ['query' => $post]);
+        if ($data) {
+            return $this->create($data, '查询成功');
+        } else {
+            return $this->create($data, '暂无数据', 204);
+        }
+    }
+
+    //修改人员信息
+    public function updatePerson(){
+        $post =  request()->param();
+        $person_model = new PersonModel();
+        $res = $person_model->updatePerson($post);
+        if ($res === true) {
+            return $this->create('', '修改成功', 200);
+        } else {
+            return $this->create('', $res, 204);
+        }
+    }
+
+    //修改人员信息
+    public function deletePerson(){
+        $post =  request()->param();
+        $person_model = new PersonModel();
+        $res = $person_model->deletePerson($post['id']);
+        if ($res === true) {
+            return $this->create('', '人员信息删除成功', 200);
+        } else {
+            return $this->create('', $res, 204);
+        }
+
     }
 
 

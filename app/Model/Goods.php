@@ -2,8 +2,8 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-04 19:58:01
- * @LastEditors: xch
+ * @LastEditTime: 2020-09-09 16:59:13
+ * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\Goods.php
  */
@@ -231,4 +231,8 @@ class Goods extends Model
             return $data;
         }
     }
+
+
+
+    //结束
 }

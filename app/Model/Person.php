@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-09 12:29:15
+ * @LastEditTime: 2020-09-09 19:05:34
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\Employee.php
@@ -16,10 +16,15 @@ namespace app\model;
 use think\Model;
 use think\facade\Db;
 use app\model\PersonTemp as PersonTempModel;
+use think\model\concern\SoftDelete;
 
 
 class Person extends Model
+
 {
+    //软删除
+    use SoftDelete;
+    protected $deleteTime = 'delete_time';
     //插入信息
     public function insertPerson($dataArr)
     {
@@ -32,7 +37,7 @@ class Person extends Model
             $person[$k]['grade'] = $v['年级'];
             $person[$k]['class'] = $v['班级'];
             $person[$k]['name'] = $v['姓名'];
-            $person[$k]['sex'] = $v['性别']==='男'?1:2;
+            $person[$k]['sex'] = $v['性别'] === '男' ? 1 : 2;
             $person[$k]['nation'] = $v['民族'];
             $person[$k]['id_card'] = $v['身份证号'];
             $person[$k]['education'] = $v['学历'];
@@ -72,13 +77,65 @@ class Person extends Model
                 return true;
             } else {
                 // Db::rollback();
-                return '插入person表失败'.$res;
+                return '插入person表失败' . $res;
             }
         } catch (\Exception  $e) {
             Db::rollback();
             // return '插入goods表失败';
-            return $e.'catch';
+            return $e . 'catch';
         }
+    }
+    //查询person
+    public function selectPerson($key, $value, $list_rows = 10, $isSimple = false, $config = '')
+    {
+        switch ($key) {
+                // case 'order_id':
+                //     $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                //     break;
+                // case 'goods_id':
+                //     $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                //     break;
+                // case 'goods_name':
+                //     $data = $this->whereLike($key, '%' . $value . '%')->paginate($list_rows, $isSimple, $config);
+                //     break;
+                // case 'shop_name':
+                //     $data = $this->whereLike($key, '%' . $value . '%')->paginate($list_rows, $isSimple, $config);
+                //     break;
+            default:
+                $data = $this->paginate($list_rows, $isSimple, $config);
+        }
+        if (empty($data)) {
+            return false;
+        } else {
+            return $data;
+        }
+    }
+
+    // 修改人员信息
+    public function updatePerson($data)
+    {
+        try {
+            $this->update($data);
+            return true;
+        } catch (\Exception $e) {
+            return $e;
+        }
+        // $res = $this->save($data);
+    }
+
+    // 修改人员信息
+    public function deletePerson($id)
+    {
+        try {
+            //软删除
+            $this->destroy($id);
+            //真实删除
+            // $this->destroy($id,true);
+            return true;
+        } catch (\Exception $e) {
+            return $e;
+        }
+        // $res = $this->save($data);
     }
 
     //获取员工信息,分页显示
@@ -141,9 +198,9 @@ class Person extends Model
         }
     }
 
-    public function saveEmpCode($work_num, $time_code,$msg = '验证码')
+    public function saveEmpCode($work_num, $time_code, $msg = '验证码')
     {
-        $emp_uuid = $this->where('work_num',$work_num)->value('uuid');        
+        $emp_uuid = $this->where('work_num', $work_num)->value('uuid');
         $data = [
             'uuid' => $emp_uuid,
             'code' => $time_code,
@@ -155,8 +212,7 @@ class Person extends Model
     }
     public function deleteEmpCode($work_num)
     {
-        $emp_uuid = $this->where('work_num',$work_num)->value('uuid');
-        return Db::table('temp_code')->where('uuid',$emp_uuid)->delete();
+        $emp_uuid = $this->where('work_num', $work_num)->value('uuid');
+        return Db::table('temp_code')->where('uuid', $emp_uuid)->delete();
     }
-
 }
