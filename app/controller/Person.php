@@ -1,8 +1,8 @@
 <?php
 /*
- * @Author: 罗曼
+ * @Author: xch
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-09-10 11:34:46
+ * @LastEditTime: 2020-09-10 11:36:48
  * @LastEditors: 罗曼
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Employee.php
  * @Description: 
@@ -17,84 +17,46 @@ use think\Request;
 use app\model\Employee as EmployeeModel;
 use app\model\EmployeeLogin as EmpLoginModel;
 use app\model\Performance as PerformanceModel;
-use app\model\Person as PersonModel;
 
 use think\facade\Db;
 
-class Admin extends Base
+class Employee extends Base
 {
-    public function importExcel()
-    {
-        $post =  request()->param();
-        $person_model = new PersonModel();
-        $res = $person_model->insertPerson($post);
-        if ($res === true) {
-            return $this->create('', '添加成功', 200);
-        } else {
-            return $this->create($res, $res, 204);
+
+
+        //激活账号验证码
+        public function sendPersonActivateCode()
+        {
+            $post = request()->param();
+            $emp_model = new EmployeeModel();
+            $emp_model->deleteEmpCode($post['work_num']);
+            $emp_uuid = $emp_model->where('work_num', $post['work_num'])->where('email', $post['email'])->value('uuid');
+            $code = rand(111111, 999999);
+            $time = time();
+            $time_code = (string)$time . (string)$code;
+            //邮箱信息
+            $title = '验证码';
+            $content = '你好, <b>朋友</b>! <br/>这是一封来自<a href="http://www.xchtzon.top"  
+                target="_blank">学创科技</a>的邮件！<br/><span>你正在激活你的员工账户,你的验证码是:' . (string)$code;
+            if (!empty($emp_uuid)) {
+                $res = $emp_model->saveEmpCode($post['work_num'], $time_code, $title);
+                if ($res) {
+                    if (sendMail($post['email'], $title, $content)) {
+                        $code = 200;
+                        $msg = '发送成功';
+                    } else {
+                        $code = 204;
+                        $msg = '发送失败';
+                    }
+                } else {
+                    $code = 204;
+                    $msg = '找不到收件人';
+                }
+                return $this->create(['uuid' => $emp_uuid], $msg, $code);
+            } else {
+                return $this->create('', '用户信息有误', 204);
+            }
         }
-    }
-
-    //员工查询个人推广商品
-    public function selectPerson()
-    {
-        $post =  request()->param();
-        // $res = $request->data;
-        $person_model = new PersonModel();
-        $val = !empty($post['number']) || !empty($post['name']);
-        $key = '';
-        $value = '';
-        // return $val;
-        if($val){
-            $key = !empty($post['number']) ? 'number' : 'name';
-            $value = urldecode($post[$key]);
-            // return $key;
-        }
-        
-        // $key = !empty($post['key']) ? $post['key'] : '';
-        // $value = !empty($post['value']) ? $post['value'] : '';
-        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $data = $person_model->selectPerson( $key, $value, $list_rows, false, ['query' => $post]);
-        if ($data) {
-            return $this->create($data, '查询成功');
-        } else {
-            return $this->create($data, '暂无数据', 204);
-        }
-    }
-
-    //修改人员信息
-    public function updatePerson(){
-        $post =  request()->param();
-        $person_model = new PersonModel();
-        $res = $person_model->updatePerson($post);
-        if ($res === true) {
-            return $this->create('', '修改成功', 200);
-        } else {
-            return $this->create('', $res, 204);
-        }
-    }
-
-    //修改人员信息
-    public function deletePerson(){
-        $post =  request()->param();
-        $person_model = new PersonModel();
-        $res = $person_model->deletePerson($post['id']);
-        if ($res === true) {
-            return $this->create('', '人员信息删除成功', 200);
-        } else {
-            return $this->create('', $res, 204);
-        }
-
-    }
-
-
-
-    
-
-    //TODO:删除
-    /************************************* */
-
-
     /**
      * 显示资源列表
      *

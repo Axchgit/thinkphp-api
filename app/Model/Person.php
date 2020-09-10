@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-09 19:05:34
+ * @LastEditTime: 2020-09-10 11:33:08
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\Employee.php
@@ -89,12 +89,12 @@ class Person extends Model
     public function selectPerson($key, $value, $list_rows = 10, $isSimple = false, $config = '')
     {
         switch ($key) {
-                // case 'order_id':
-                //     $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
-                //     break;
-                // case 'goods_id':
-                //     $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
-                //     break;
+                case 'number':
+                    $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                    break;
+                case 'name':
+                    $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                    break;
                 // case 'goods_name':
                 //     $data = $this->whereLike($key, '%' . $value . '%')->paginate($list_rows, $isSimple, $config);
                 //     break;
@@ -137,6 +137,17 @@ class Person extends Model
         }
         // $res = $this->save($data);
     }
+
+
+
+
+
+
+
+
+
+    //TODO:删除
+    /************************************ */
 
     //获取员工信息,分页显示
     public function getEmpInfo($list_rows, $isSimple = false, $config)
