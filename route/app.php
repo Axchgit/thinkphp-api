@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-09-09 11:53:16
+ * @LastEditTime: 2020-09-16 12:43:20
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\route\app.php
@@ -44,6 +44,14 @@ Route::group('login', function () {
 })->completeMatch()->prefix('Login/');
 /****员工*****/
 // Route::resource('employee','Employee');
+
+Route::group('admin', function () {
+    Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
+    // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
+})->completeMatch()->prefix('Admin/');
+
+
+
 Route::group('employee', function () {
     //获取员工所有信息
     Route::get('selectall', 'selectAll')->middleware('checkrequest', 1)->allowCrossDomain();
@@ -76,7 +84,3 @@ Route::group('goods', function () {
 })->completeMatch()->prefix('Goods/');
 
 
-Route::group('admin', function () {
-    Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
-    // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
-})->completeMatch()->prefix('Admin/');

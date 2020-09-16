@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-10 11:33:08
+ * @LastEditTime: 2020-09-16 12:32:49
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\Employee.php
@@ -45,6 +45,16 @@ class Person extends Model
             $person[$k]['phone_number'] = $v['手机号'];
             $person[$k]['email'] = $v['邮箱'];
             $person[$k]['comment'] = $v['备注'];
+            switch ($person[$k]['post']) {
+                case '学生':
+                    $person[$k]['role'] = 8;
+                    break;
+                case '教师':
+                    $person[$k]['role'] = 6;
+                    break;
+                default:
+                    $person[$k]['role'] = 9;
+            }
         }
         // }
         Db::startTrans();
@@ -89,12 +99,12 @@ class Person extends Model
     public function selectPerson($key, $value, $list_rows = 10, $isSimple = false, $config = '')
     {
         switch ($key) {
-                case 'number':
-                    $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
-                    break;
-                case 'name':
-                    $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
-                    break;
+            case 'number':
+                $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                break;
+            case 'name':
+                $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                break;
                 // case 'goods_name':
                 //     $data = $this->whereLike($key, '%' . $value . '%')->paginate($list_rows, $isSimple, $config);
                 //     break;
@@ -137,8 +147,26 @@ class Person extends Model
         }
         // $res = $this->save($data);
     }
+    //发送验证码
+    public function savePersonCode($number, $time_code, $msg = '验证码')
+    {
+        // $emp_uuid = $this->where('work_num',$work_num)->value('uuid');        
+        $data = [
+            'uuid' => $number,
+            'code' => $time_code,
+            'msg' => $msg
+        ];
+        //知识点:跨表数据库操作
+        return Db::table('temp_code')->insert($data);
+        // $admin->code = $log_code;
+    }
 
+    //删除验证码
 
+    public function deletePersonCode($number)
+    {
+        return Db::table('temp_code')->where('uuid', $number)->delete();
+    }
 
 
 
@@ -207,23 +235,5 @@ class Person extends Model
         } else {
             return $data;
         }
-    }
-
-    public function saveEmpCode($work_num, $time_code, $msg = '验证码')
-    {
-        $emp_uuid = $this->where('work_num', $work_num)->value('uuid');
-        $data = [
-            'uuid' => $emp_uuid,
-            'code' => $time_code,
-            'msg' => $msg
-        ];
-        //知识点:跨表数据库操作
-        return Db::table('temp_code')->insert($data);
-        // $admin->code = $log_code;
-    }
-    public function deleteEmpCode($work_num)
-    {
-        $emp_uuid = $this->where('work_num', $work_num)->value('uuid');
-        return Db::table('temp_code')->where('uuid', $emp_uuid)->delete();
     }
 }
