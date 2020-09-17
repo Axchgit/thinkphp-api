@@ -2,8 +2,8 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-08-24 01:58:33
- * @LastEditors: xch
+ * @LastEditTime: 2020-09-17 13:15:51
+ * @LastEditors: Chenhao Xing
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Login.php
  */
@@ -17,6 +17,8 @@ namespace app\controller;
 use think\Request;
 use app\model\Admin as AdminModel;
 use app\model\EmployeeLogin as EmpModel;
+use app\model\PersonAccount as PersonAccountModel;
+
 
 use think\facade\Db;
 
@@ -151,26 +153,26 @@ class Login extends Base
         }
     }
 
-    public function checkEmpLogin()
+    public function checkPerosnLogin()
     {
         //获取请求信息
         $post =  request()->param();
         //实例化模型
-        $emp_model = new EmpModel();
+        $pa_model = new PersonAccountModel();
         //获取管理员信息
-        $emp_info = $emp_model->findEmployee($post['username'], $post['password']);
-        $emp_role = $emp_model->getInfoByUuid($emp_info['uuid'],'role');
+        $person_info = $pa_model->findPersonAccount($post['number'], $post['password']);
+        $person_role = $pa_model->getInfoByNumber($person_info['number'],'role');
         //检查是否为空
-        if (!empty($emp_info) && !empty($emp_role)) {
-            $token = signToken($emp_info['uuid'], $emp_role);
+        if (!empty($person_info) && !empty($person_role)) {
+            $token = signToken($person_info['number'], $person_role);
             $data = [
                 'token' => $token,
-                'uuid' => $emp_info['uuid'],
-                'role' => $emp_role
+                'number' => $person_info['number'],
+                'role' => $person_info
             ];
             //添加登录记录
             $records = [
-                'uuid' => $emp_info['uuid'],
+                'uuid' => $person_info['number'],
                 'login_time' => time(),
                 'login_ip' => request()->host()
             ];
