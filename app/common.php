@@ -99,7 +99,7 @@ function  createGuid()
  * @param mixed $uuid
  * @return {string} $jwt:生成的jwt字符串
  */
-function signToken($uuid,$role)
+function signToken($number,$role)
 {
     $key = config('login.token_key');         //这里是自定义的一个随机字串，应该写在config文件中的，解密时也会用，相当    于加密中常用的 盐  salt
     $token = array(
@@ -109,7 +109,7 @@ function signToken($uuid,$role)
         "nbf" => time(),    //在什么时候jwt开始生效  （这里表示生成100秒后才生效）
         "exp" => time() + 2592000, //token 过期时间
         "data" => [           //记录的userid的信息，这里是自已添加上去的，如果有其它信息，可以再添加数组的键值对
-            'uuid' => $uuid,
+            'uuid' => $number,
             'role' => $role,
         ]
     );

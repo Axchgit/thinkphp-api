@@ -2,8 +2,8 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-09-16 12:43:20
- * @LastEditors: 罗曼
+ * @LastEditTime: 2020-09-23 16:04:32
+ * @LastEditors: Chenhao Xing
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\route\app.php
  */
@@ -39,8 +39,8 @@ Route::group('login', function () {
     //获取管理员信息请求
     Route::rule('selectadmininfo', 'selectAdminInfo')->middleware('checkrequest', 1)->allowCrossDomain();
     //员工登录
-    Route::rule('checkEmplogin', 'checkEmpLogin')->allowCrossDomain();
-    Route::rule('selectempinfo', 'selectEmpInfo')->middleware('checkrequest', 5)->allowCrossDomain();
+    Route::rule('checkPersonLogin', 'checkPersonLogin')->allowCrossDomain();
+    Route::rule('selectPersonInfo', 'selectPersonInfo')->middleware('checkrequest', 8)->allowCrossDomain();
 })->completeMatch()->prefix('Login/');
 /****员工*****/
 // Route::resource('employee','Employee');
@@ -49,6 +49,12 @@ Route::group('admin', function () {
     Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Admin/');
+
+Route::group('person', function () {
+    // Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
+    // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
+})->completeMatch()->prefix('Admin/');
+
 
 
 

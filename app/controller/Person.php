@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-09-17 12:32:45
+ * @LastEditTime: 2020-09-23 18:57:47
  * @LastEditors: Chenhao Xing
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Employee.php
  * @Description: 
@@ -28,13 +28,14 @@ use think\facade\Db;
 class Person extends Base
 {
 
-
+/************激活账号****** */
     //激活账号验证码
     public function sendPersonActivateCode()
     {
         $post = request()->param();
         $person_model = new PersonModel();
         $person_model->deletePersonCode($post['number']);
+        //知识点:判断账户是否存在且未激活
         $person_name = $person_model->where('number', $post['number'])->where('active_state', 0)->where('email', $post['email'])->value('name');
         $code = rand(111111, 999999);
         $time = time();
@@ -90,6 +91,80 @@ class Person extends Base
             return $this->create('', '验证码错误', 201);
         }
     }
+/****************************** */
+
+/************找回密码*********** */
+    //忘记密码-发送验证码
+    public function sendRecoverCode()
+    {
+        $post = request()->param();
+        $person_model = new PersonModel();
+        $person_model->deletePersonCode($post['number']);
+        $person_name = $person_model->where('number', $post['number'])->where('email', $post['email'])->value('name');
+        //验证码
+        $code = rand(111111, 999999);
+        $time = time();
+        $time_code = (string)$time . (string)$code;
+        //邮箱内容
+        $title = '验证码';
+        $content = '你好, <b>' . $person_name . '同志</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在找回你的入党申请账户密码,你的验证码是:' . (string)$code;
+        $res = $person_model->where('number', $post['number'])->where('email', $post['email'])->find();
+        if (!empty($res)) {
+            $res = $person_model->savePersonCode($post['number'], $time_code, $title);
+            if ($res) {
+                if (sendMail($post['email'], $title, $content)) {
+                    $code = 200;
+                    $msg = '发送成功';
+                } else {
+                    $code = 204;
+                    $msg = '发送失败';
+                }
+            } else {
+                $code = 204;
+                $msg = '找不到收件人';
+            }
+            return $this->create('', $msg, $code);
+        } else {
+            return $this->create('', '用户信息有误', 204);
+        }
+    }
+
+    //忘记密码-检查信息
+    public function checkRecover()
+    {
+        $post = request()->param();
+        // $number = PersonModel::where('number', $post['work_num'])->value('uuid');
+        $code_info = Db::table('temp_code')->where('uuid', $post['number'])->find();
+
+        $string_code = (string)$code_info['code'];
+        $code = substr($string_code, 10, 6);
+        //获取当前时间戳
+        $now = time();
+        //获取登录码时间戳
+        $time = substr($string_code, 0, 10);
+        if ($code == $post['code']) {
+            if ($time + config("login.code_timeout") >= $now) {
+                return $this->create(['number' => $post['number']], '成功', 200);
+            } else {
+                return $this->create('', '验证码超时', 201);
+            }
+        } else {
+            return $this->create('', '验证码错误', 204);
+        }
+    }
+    //忘记密码-修改
+    public function updatePassword()
+    {
+        $post = request()->param();
+        $pa_model = new PersonAccountModel();
+        $res = $pa_model->updatePassword($post['number'], $post['password']);
+        if ($res) {
+            return $this->create('', '成功', 200);
+        } else {
+            return $this->create('', '修改失败', 204);
+        }
+    }
+    /**************************** */
 
 
 
@@ -214,77 +289,8 @@ class Person extends Base
             return $this->create($data, '暂无数据', 204);
         }
     }
-    //忘记密码-发送验证码
-    public function sendRecoverCode()
-    {
-        $post = request()->param();
-        $emp_model = new EmployeeModel();
-        $emp_model->deleteEmpCode($post['work_num']);
-        //验证码
-        $code = rand(111111, 999999);
-        $time = time();
-        $time_code = (string)$time . (string)$code;
-        //邮箱内容
-        $title = '验证码';
-        $content = '你好, <b>朋友</b>! <br/>这是一封来自<a href="http://www.xchtzon.top"  
-            target="_blank">学创科技</a>的邮件！<br/><span>你正在修改你的密码,你的验证码是:' . (string)$code;
-        $res = $emp_model->where('work_num', $post['work_num'])->where('email', $post['email'])->find();
-        if (!empty($res)) {
 
-            $res = $emp_model->saveEmpCode($post['work_num'], $time_code, $title);
-            if ($res) {
 
-                if (sendMail($post['email'], $title, $content)) {
-                    $code = 200;
-                    $msg = '发送成功';
-                } else {
-                    $code = 204;
-                    $msg = '发送失败';
-                }
-            } else {
-                $code = 204;
-                $msg = '找不到收件人';
-            }
-            return $this->create('', $msg, $code);
-        } else {
-            return $this->create('', '用户信息有误', 204);
-        }
-    }
-    //忘记密码-检查信息
-    public function checkRecover()
-    {
-        $post = request()->param();
-        $emp_uuid = EmployeeModel::where('work_num', $post['work_num'])->value('uuid');
-        $code_info = Db::table('temp_code')->where('uuid', $emp_uuid)->find();
-
-        $string_code = (string)$code_info['code'];
-        $code = substr($string_code, 10, 6);
-        //获取当前时间戳
-        $now = time();
-        //获取登录码时间戳
-        $time = substr($string_code, 0, 10);
-        if ($code == $post['code']) {
-            if ($time + config("login.code_timeout") >= $now) {
-                return $this->create(['uuid' => $emp_uuid], '成功', 200);
-            } else {
-                return $this->create('', '验证码超时', 201);
-            }
-        } else {
-            return $this->create('', '验证码错误', 204);
-        }
-    }
-    //忘记密码-修改
-    public function updateAcPW()
-    {
-        $post = request()->param();
-        $emp_login = new EmpLoginModel();
-        $res = $emp_login->updatePW($post['uuid'], $post['password']);
-        if ($res) {
-            return $this->create('', '成功', 200);
-        } else {
-            return $this->create('', '修改失败', 204);
-        }
-    }
     //激活账号验证码
     public function sendActivateCode()
     {

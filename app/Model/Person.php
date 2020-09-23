@@ -2,8 +2,8 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-16 12:32:49
- * @LastEditors: 罗曼
+ * @LastEditTime: 2020-09-23 15:46:38
+ * @LastEditors: Chenhao Xing
  * @Description: 员工信息
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\Employee.php
  */
@@ -167,6 +167,12 @@ class Person extends Model
     {
         return Db::table('temp_code')->where('uuid', $number)->delete();
     }
+    //获取信息
+    public function getInfoByNumber($number, $value)
+    {
+        return $this->where('number', $number)->value($value);
+    }
+
 
 
 

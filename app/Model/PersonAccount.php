@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-17 13:12:17
+ * @LastEditTime: 2020-09-23 18:57:56
  * @LastEditors: Chenhao Xing
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\EmployeeLogin.php
@@ -43,6 +43,13 @@ class PersonAccount extends Model
     public function getInfoByNumber($number, $value)
     {
         return Db::table('person')->where('number', $number)->value($value);
+    }
+
+//更新密码
+    public function updatePassword($number,$new_password){
+        $person =  $this->where('number',$number)->find();
+        $person->password = $new_password;
+        return $person->save();
     }
 
 
@@ -107,13 +114,6 @@ class PersonAccount extends Model
     public function getAcInfo($emp_uuid)
     {
         return $this->where('uuid', $emp_uuid)->select();
-    }
-
-    public function updatePW($uuid, $new_password)
-    {
-        $emp =  $this->where('uuid', $uuid)->find();
-        $emp->password = $new_password;
-        return $emp->save();
     }
 
     public function insertEmpAc($post)

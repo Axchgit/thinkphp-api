@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-09-17 13:15:51
+ * @LastEditTime: 2020-09-23 16:54:03
  * @LastEditors: Chenhao Xing
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Login.php
@@ -17,6 +17,8 @@ namespace app\controller;
 use think\Request;
 use app\model\Admin as AdminModel;
 use app\model\EmployeeLogin as EmpModel;
+use app\model\Person as PersonModel;
+
 use app\model\PersonAccount as PersonAccountModel;
 
 
@@ -74,8 +76,7 @@ class Login extends Base
         //查询账户对应email
         $admin_email = $admin_model->selectMail($post['username']);
         $title = '登录码';
-        $content = '你好, <b>朋友</b>! <br/>这是一封来自<a href="http://www.xchtzon.top"  
-        target="_blank">学创科技</a>的邮件！<br/><span>你的验证码是:' . (string)$code;
+        $content = '你好, <b>朋友</b>! <br/><br/><span>你的验证码是:' . (string)$code;
         if ($res) {
             if (sendMail($admin_email, $title, $content)) {
                 $code = 200;
@@ -159,16 +160,20 @@ class Login extends Base
         $post =  request()->param();
         //实例化模型
         $pa_model = new PersonAccountModel();
-        //获取管理员信息
+        //验证获取信息
         $person_info = $pa_model->findPersonAccount($post['number'], $post['password']);
+        //根据学号从person表里查询数据
         $person_role = $pa_model->getInfoByNumber($person_info['number'],'role');
+        // $person_name = $pa_model->getInfoByNumber($person_info['number'],'name');
+
         //检查是否为空
         if (!empty($person_info) && !empty($person_role)) {
             $token = signToken($person_info['number'], $person_role);
             $data = [
                 'token' => $token,
+                // 'name' =>$person_name,
                 'number' => $person_info['number'],
-                'role' => $person_info
+                'role' => $person_role
             ];
             //添加登录记录
             $records = [
@@ -187,12 +192,15 @@ class Login extends Base
         }
     }
 
-    public function selectEmpInfo(Request $request){
-        $emp_model = new EmpModel();
+    public function selectPersonInfo(Request $request){
+        $person_model = new PersonModel();
         $res = $request->data;
+        // return $this->create($res);
+        // return $res;
         // $emp_info = $emp_model->getAcInfo($res['data']->uuid);
-        $emp_info = $emp_model->where('uuid', $res['data']->uuid)->find();
-        return $this->create($emp_info);
+        $person_info = $person_model->where('number', $res['data']->uuid)->find();
+        $person_info['id_photo'] = Db::table('person_account')->where('number', $res['data']->uuid)->value('id_photo');
+        return $this->create($person_info);
     }
 
 
