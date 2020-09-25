@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-09-26 02:18:02
+ * @LastEditTime: 2020-09-26 02:31:14
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -48,7 +48,8 @@ Route::group('login', function () {
 Route::group('admin', function () {
     
     Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
-    Route::get('selectPersonAccount', 'selectPersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
+    Route::get('selectPersonAccount', '
+    ')->middleware('checkrequest', 1)->allowCrossDomain();
     
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Admin/');
