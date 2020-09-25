@@ -2,10 +2,10 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-23 15:46:38
- * @LastEditors: Chenhao Xing
+ * @LastEditTime: 2020-09-26 02:26:04
+ * @LastEditors: 罗曼
  * @Description: 员工信息
- * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\Employee.php
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
  */
 
 namespace app\model;
@@ -167,7 +167,12 @@ class Person extends Model
     {
         return Db::table('temp_code')->where('uuid', $number)->delete();
     }
-    //获取信息
+    //获取所有信息
+    public function getAllInfoByNumber($number)
+    {
+        return $this->where('number', $number)->find();
+    }
+    //获取单个信息
     public function getInfoByNumber($number, $value)
     {
         return $this->where('number', $number)->value($value);

@@ -2,10 +2,10 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-09-23 16:04:32
- * @LastEditors: Chenhao Xing
+ * @LastEditTime: 2020-09-26 02:18:02
+ * @LastEditors: 罗曼
  * @Description: 
- * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\route\app.php
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
  */
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
@@ -46,7 +46,10 @@ Route::group('login', function () {
 // Route::resource('employee','Employee');
 
 Route::group('admin', function () {
+    
     Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
+    Route::get('selectPersonAccount', 'selectPersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
+    
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Admin/');
 

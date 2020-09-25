@@ -1,11 +1,11 @@
 <?php
 /*
- * @Author: xch
- * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-23 18:57:56
- * @LastEditors: Chenhao Xing
  * @Description: 
- * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\EmployeeLogin.php
+ * @Author: 罗曼
+ * @Date: 2020-09-17 12:09:09
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\PersonAccount.php
+ * @LastEditTime: 2020-09-26 01:47:15
+ * @LastEditors: 罗曼
  */
 
 namespace app\model;
@@ -20,7 +20,7 @@ use think\facade\Db;
 class PersonAccount extends Model
 {
 
-    //添加id_photo存放地址
+    //TODO添加id_photo存放地址
     public function insertPersonAccount($post)
     {
         return $this->allowField(['number', 'password', 'profile'])->save($post);
@@ -51,6 +51,61 @@ class PersonAccount extends Model
         $person->password = $new_password;
         return $person->save();
     }
+
+/*********管理员数据操作 */
+        //查询person账户
+        public function selectPersonAccount($key, $value, $list_rows = 10, $isSimple = false, $config = '')
+        {
+            switch ($key) {
+                case 'number':
+                    $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                    break;
+                // case 'name':
+                //     $data = $this->where($key, $value)->paginate($list_rows, $isSimple, $config);
+                //     break;
+                    // case 'goods_name':
+                    //     $data = $this->whereLike($key, '%' . $value . '%')->paginate($list_rows, $isSimple, $config);
+                    //     break;
+                    // case 'shop_name':
+                    //     $data = $this->whereLike($key, '%' . $value . '%')->paginate($list_rows, $isSimple, $config);
+                    //     break;
+                default:
+                    $data = $this->paginate($list_rows, $isSimple, $config);
+            }
+            if (empty($data)) {
+                return false;
+            } else {
+                return $data;
+            }
+        }
+    
+        // 修改人员账户信息
+        public function updatePersonAccount($data)
+        {
+            try {
+                $this->update($data);
+                return true;
+            } catch (\Exception $e) {
+                return $e;
+            }
+            // $res = $this->save($data);
+        }
+    
+        // 修改人员信息
+        public function deletePersonAccount($id)
+        {
+            try {
+                //软删除
+                $this->destroy($id);
+                //真实删除
+                // $this->destroy($id,true);
+                return true;
+            } catch (\Exception $e) {
+                return $e;
+            }
+            // $res = $this->save($data);
+        }
+        /*************** */
 
 
 

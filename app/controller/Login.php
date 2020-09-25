@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-09-23 16:54:03
+ * @LastEditTime: 2020-09-26 01:30:21
  * @LastEditors: Chenhao Xing
  * @Description: 
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Login.php
@@ -76,7 +76,9 @@ class Login extends Base
         //查询账户对应email
         $admin_email = $admin_model->selectMail($post['username']);
         $title = '登录码';
-        $content = '你好, <b>朋友</b>! <br/><br/><span>你的验证码是:' . (string)$code;
+        $content = '你好, <b>' . $post['username']. '管理员</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在登录的管理员账户,你的验证码是:' . (string)$code;
+
+        // $content = '你好, <b>朋友</b>! <br/><br/><span>你的验证码是:' . (string)$code;
         if ($res) {
             if (sendMail($admin_email, $title, $content)) {
                 $code = 200;
