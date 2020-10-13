@@ -2,9 +2,9 @@
 /*
  * @Author: xch
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-09-23 18:57:47
- * @LastEditors: Chenhao Xing
- * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Employee.php
+ * @LastEditTime: 2020-10-07 17:20:44
+ * @LastEditors: 罗曼
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
  * @Description: 
  */
 
@@ -28,7 +28,7 @@ use think\facade\Db;
 class Person extends Base
 {
 
-/************激活账号****** */
+    /************激活账号****** */
     //激活账号验证码
     public function sendPersonActivateCode()
     {
@@ -91,9 +91,9 @@ class Person extends Base
             return $this->create('', '验证码错误', 201);
         }
     }
-/****************************** */
+    /****************************** */
 
-/************找回密码*********** */
+    /************找回密码*********** */
     //忘记密码-发送验证码
     public function sendRecoverCode()
     {
@@ -165,6 +165,25 @@ class Person extends Base
         }
     }
     /**************************** */
+
+    /**************************** 文件上传*/
+    public function uploadApplicatioin()
+    {
+        $file = request()->file('file');
+        try {
+            validate(['file' => ['filesize:512000','fileExt:doc,docx']])
+                ->check(['file'=>$file]);
+            $savename = \think\facade\Filesystem::disk('public')->putFile('application', $file);
+            return $this->create($savename, '上传成功', 200);
+        } catch (\think\exception\ValidateException $e) {
+            return $this->create('', $e->getMessage(), 204);
+        }
+    }
+    /**************************** */
+
+
+    /**************************** */
+
 
 
 

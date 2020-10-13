@@ -2,10 +2,10 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-09-26 01:30:21
- * @LastEditors: Chenhao Xing
+ * @LastEditTime: 2020-10-04 16:28:28
+ * @LastEditors: 罗曼
  * @Description: 
- * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Login.php
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Login.php
  */
 
 
@@ -164,6 +164,8 @@ class Login extends Base
         $pa_model = new PersonAccountModel();
         //验证获取信息
         $person_info = $pa_model->findPersonAccount($post['number'], $post['password']);
+        // return json($person_info);
+
         //根据学号从person表里查询数据
         $person_role = $pa_model->getInfoByNumber($person_info['number'],'role');
         // $person_name = $pa_model->getInfoByNumber($person_info['number'],'name');

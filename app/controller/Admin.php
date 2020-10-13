@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-09-26 02:26:27
+ * @LastEditTime: 2020-09-26 11:31:10
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -140,7 +140,7 @@ class Admin extends Base
         //删除人员账户
         public function deletePersonAccount(){
             $post =  request()->param();
-            $pa_model = new PersonModel();
+            $pa_model = new PersonAccountModel();
             $res = $pa_model->deletePersonAccount($post['id']);
             if ($res === true) {
                 return $this->create('', '人员信息删除成功', 200);
