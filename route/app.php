@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-09-26 11:14:12
+ * @LastEditTime: 2020-10-15 00:12:59
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -56,9 +56,12 @@ Route::group('admin', function () {
 })->completeMatch()->prefix('Admin/');
 
 Route::group('person', function () {
-    // Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
+    Route::post('uploadApplicatioin', 'uploadApplicatioin')->middleware('checkrequest', 8)->allowCrossDomain();
+    Route::get('getPartyBranch', 'getPartyBranch')->middleware('checkrequest', 8)->allowCrossDomain();
+    Route::get('getIsOneStep', 'getIsOneStep')->middleware('checkrequest', 8)->allowCrossDomain();
+    
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
-})->completeMatch()->prefix('Admin/');
+})->completeMatch()->prefix('Person/');
 
 
 

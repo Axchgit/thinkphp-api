@@ -1,4 +1,12 @@
 <?php
+/*
+ * @Description: 
+ * @Author: 罗曼
+ * @Date: 2020-09-12 02:32:00
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\config\app.php
+ * @LastEditTime: 2020-10-14 17:19:21
+ * @LastEditors: 罗曼
+ */
 // +----------------------------------------------------------------------
 // | 应用设置
 // +----------------------------------------------------------------------
@@ -28,5 +36,9 @@ return [
     // 错误显示信息,非调试模式有效
     'error_message'    => '页面错误！请稍后再试～',
     // 显示错误信息
-    'show_error_msg'   => false,
+    'show_error_msg'   => true,
+
+
+    /********自行加入 */
+    'json_path' => './json'
 ];

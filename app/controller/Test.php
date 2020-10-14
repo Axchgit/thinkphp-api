@@ -2,10 +2,10 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-09-04 19:36:32
- * @LastEditors: xch
+ * @LastEditTime: 2020-10-14 17:28:59
+ * @LastEditors: 罗曼
  * @Description: 
- * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\controller\Test.php
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Test.php
  */
 
 
@@ -26,15 +26,32 @@ use app\model\GoodsTemp as GoodsTempModel;
 
 class Test extends Base
 {
+    public function night()
+    {
+        $fileName = config('app.json_path') . '/options.json';
+        $string = file_get_contents($fileName);
+        $data = json_decode($string, true);
+        $faculty = '02';
 
-    public function eight(){
+        // PHP数组查询
+        // 定义要查找的是哪个键的值
+        $found_arr = array_column($data, 'value');
+        // var_dump($found_arr)
+        $found_key = array_search($faculty, $found_arr);
+        // $found_key = 0; 返回键名
+        return $data[$found_key];
+        return $data[0];
+    }
+
+    public function eight()
+    {
 
         $goods_model = new GoodsModel();
         // return '132';
         return $goods_model->incrementalUpdata();
-
     }
-    public function seven(){
+    public function seven()
+    {
 
         $post =  request()->param();
         $gt_model = new GoodsTempModel();
@@ -49,23 +66,27 @@ class Test extends Base
 
     }
 
-    public function testOne(){
+    public function testOne()
+    {
         // $admin_model = new AdminModel();
         // $data = $admin_model->saveLogcode('呵粑粑牛',12321);
         return json(true);
     }
-    public function testTwo(){
+    public function testTwo()
+    {
         // $admin_model = new AdminModel();
         // $data = $admin_model->deleteLogcode('呵粑粑牛');
         return time();
     }
     //获取一个uuid
-    public function testThree(){
+    public function testThree()
+    {
         // $admin_model = new AdminModel();
         // $data = $admin_model->deleteLogcode('呵粑粑牛');
         return createGuid();
     }
-    public function testFour($uuid){
+    public function testFour($uuid)
+    {
         $records = [
             'uuid' => $uuid,
             'login_time' => time(),
@@ -75,40 +96,43 @@ class Test extends Base
         return true;
     }
     //中间件传参
-    public function testFive(Request $request){
+    public function testFive(Request $request)
+    {
         $res = $request->data;
         // return $res;
         return $this->create($res['data']->uuid);
     }
     //前端表格数据
-    public function testSix(){
+    public function testSix()
+    {
         $post = request()->param();
         $goods = [];
-        $dataArr =[
+        $dataArr = [
             [
-            "订单号"=> 124465937518,
-            "父单号"=>0,
-            "订单状态"=> "待付款",
-            "下单时间"=> 44000.46486111111,
-            "商品ID"=> 10445274829,
+                "订单号" => 124465937518,
+                "父单号" => 0,
+                "订单状态" => "待付款",
+                "下单时间" => 44000.46486111111,
+                "商品ID" => 10445274829,
             ],
             [
-            "订单号"=> 118921513114,
-            "父单号"=> 0,
-            "订单状态"=> "已付款",
-            "下单时间"=> 44000.46476851852,
-            "商品ID"=> 931177, 
-            ]];
+                "订单号" => 118921513114,
+                "父单号" => 0,
+                "订单状态" => "已付款",
+                "下单时间" => 44000.46476851852,
+                "商品ID" => 931177,
+            ]
+        ];
 
-            foreach($dataArr as $k => $v){
-                $goods[$k]['id'] = $v['订单号'];
-                $goods[$k]['f_id'] = $v['父单号'];
+        foreach ($dataArr as $k => $v) {
+            $goods[$k]['id'] = $v['订单号'];
+            $goods[$k]['f_id'] = $v['父单号'];
 
-                // return [$k=>$v];
-            }
-            return json($goods);
+            // return [$k=>$v];
+        }
+        return json($goods);
 
-            // return json($post);
+        // return json($post);
     }
 
     /**

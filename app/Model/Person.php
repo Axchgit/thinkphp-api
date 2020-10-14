@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-09-26 02:26:04
+ * @LastEditTime: 2020-10-14 23:58:52
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -133,7 +133,7 @@ class Person extends Model
         // $res = $this->save($data);
     }
 
-    // 修改人员信息
+    // 删除人员信息
     public function deletePerson($id)
     {
         try {
@@ -176,6 +176,16 @@ class Person extends Model
     public function getInfoByNumber($number, $value)
     {
         return $this->where('number', $number)->value($value);
+    }
+    //根据学号修改信息
+    public function updateByNumber($number, $value)
+    {
+        try {
+            $this->where('number', $number)->update($value);
+            return true;
+        } catch (\Exception $e) {
+            return $e;
+        }
     }
 
 

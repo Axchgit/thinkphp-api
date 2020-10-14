@@ -1,12 +1,13 @@
 <?php
 /*
- * @Author: xch
- * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-10-07 17:20:44
- * @LastEditors: 罗曼
- * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
  * @Description: 
+ * @Author: 罗曼
+ * @Date: 2020-09-12 02:32:00
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
+ * @LastEditTime: 2020-10-15 00:22:20
+ * @LastEditors: 罗曼
  */
+
 
 declare(strict_types=1);
 
@@ -16,12 +17,15 @@ use think\Request;
 
 use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
+use app\model\Material as MaterialModel;
+use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 
 
 
 use app\model\Employee as EmployeeModel;
 use app\model\EmployeeLogin as EmpLoginModel;
 use app\model\Performance as PerformanceModel;
+
 
 use think\facade\Db;
 
@@ -167,19 +171,67 @@ class Person extends Base
     /**************************** */
 
     /**************************** 文件上传*/
-    public function uploadApplicatioin()
+    public function uploadApplicatioin(Request $request)
     {
         $file = request()->file('file');
+        $branch_value = request()->header('partyBranch');
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $person_model = new PersonModel();
+        $material_model = new MaterialModel();
         try {
-            validate(['file' => ['filesize:512000','fileExt:doc,docx']])
-                ->check(['file'=>$file]);
+            validate(['file' => ['filesize:512000', 'fileExt:doc,docx']])
+                ->check(['file' => $file]);
             $savename = \think\facade\Filesystem::disk('public')->putFile('application', $file);
-            return $this->create($savename, '上传成功', 200);
+
+            //添加申请书路径到数据库
+            $res_add = $material_model->addMaterial($number, 4, '', '', $savename);
+            //修改人员党支部数据
+            $res_update = $person_model->updateByNumber($number,['party_branch'=>$branch_value]);
+            if ($res_add === true && $res_update === true) {
+                return $this->create('', '上传成功', 200);
+            } else {
+                return $this->create('', [$res_add,$res_update], 204);
+            }
+            // return $this->create($savename, '上传成功', 200);
         } catch (\think\exception\ValidateException $e) {
             return $this->create('', $e->getMessage(), 204);
         }
     }
     /**************************** */
+    //获取所在学院党支部列表
+    public function getPartyBranch(Request $request){
+        //获取token中的学号
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+
+        $person_model = new PersonModel();
+        //根据学号获取学院代码
+        $faculty = $person_model->getInfoByNumber($number,'faculty');
+        $fileName = config('app.json_path') . '/options.json';
+        $string = file_get_contents($fileName);
+        $data = json_decode($string, true);
+        // 知识点:PHP数组查询
+        $found_arr = array_column($data, 'value');
+        // var_dump($found_arr)
+        $found_key = array_search($faculty, $found_arr);
+        // $found_key = 0; 返回键名
+        return $this->create($data[$found_key], '', 200);
+        // return $data[$found_key];
+    }
+    //获取第一步是否提交
+    public function getIsOneStep(Request $request){
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+
+        $material_model = new MaterialModel();
+        $res=$material_model->selectInfoByNumber($number,4);
+        if($res!==null){
+            return $this->create(['code'=>1], '', 200);
+        }
+        
+
+    }
 
 
     /**************************** */
