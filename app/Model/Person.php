@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-10-14 23:58:52
+ * @LastEditTime: 2020-10-24 11:02:26
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -187,6 +187,24 @@ class Person extends Model
             return $e;
         }
     }
+    //获取人员信息,分页显示
+
+    public function getAllPerson($list_rows, $isSimple = false, $config,$faculty)
+    {
+        if($faculty==''){
+            $data = $this->paginate($list_rows, $isSimple = false, $config);
+
+        }else{
+            $data = $this->where('faculty',$faculty)->paginate($list_rows, $isSimple = false, $config);
+        }
+        //判断是否有值
+        if ($data->isEmpty()) {
+            return false;
+        } else {
+            return $data;
+        }
+    }
+
 
 
 

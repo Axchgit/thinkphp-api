@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-10-15 00:17:45
+ * @LastEditTime: 2020-10-16 17:07:18
  * @LastEditors: 罗曼
  */
 
@@ -38,9 +38,9 @@ class Material extends Model
             return  $e->getMessage();
         }
     }
-    //查询是否有申请书
-    public function selectInfoByNumber($number, $category)
+    //根据学号查询信息
+    public function selectInfoByNumber($number, $key, $value)
     {
-        return $this->where('number', $number)->where('category', $category)->find();
+        return $this->where('number', $number)->where($key, $value)->find();
     }
 }

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-10-15 00:22:20
+ * @LastEditTime: 2020-10-24 13:54:02
  * @LastEditors: 罗曼
  */
 
@@ -19,6 +19,7 @@ use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
 use app\model\Material as MaterialModel;
 use app\model\RecruitPartyMember as RecruitPartyMemberModel;
+use app\model\JoinApply as JoinApplyModel;
 
 
 
@@ -179,19 +180,21 @@ class Person extends Base
         $number = $tooken_res['data']->uuid;
         $person_model = new PersonModel();
         $material_model = new MaterialModel();
+        $ja_model = new JoinApplyModel();
         try {
             validate(['file' => ['filesize:512000', 'fileExt:doc,docx']])
                 ->check(['file' => $file]);
             $savename = \think\facade\Filesystem::disk('public')->putFile('application', $file);
-
             //添加申请书路径到数据库
             $res_add = $material_model->addMaterial($number, 4, '', '', $savename);
             //修改人员党支部数据
-            $res_update = $person_model->updateByNumber($number,['party_branch'=>$branch_value]);
-            if ($res_add === true && $res_update === true) {
-                return $this->create('', '上传成功', 200);
+            $res_update = $person_model->updateByNumber($number, ['party_branch' => $branch_value]);
+            //添加申请信息
+            $res_ja = $ja_model->addApply($number, 1);
+            if ($res_add === true && $res_update === true && $res_ja === true) {
+                return $this->create('', '申请成功', 200);
             } else {
-                return $this->create('', [$res_add,$res_update], 204);
+                return $this->create('', [$res_add, $res_update, $res_ja], 204);
             }
             // return $this->create($savename, '上传成功', 200);
         } catch (\think\exception\ValidateException $e) {
@@ -200,14 +203,15 @@ class Person extends Base
     }
     /**************************** */
     //获取所在学院党支部列表
-    public function getPartyBranch(Request $request){
+    public function getPartyBranch(Request $request)
+    {
         //获取token中的学号
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
 
         $person_model = new PersonModel();
         //根据学号获取学院代码
-        $faculty = $person_model->getInfoByNumber($number,'faculty');
+        $faculty = $person_model->getInfoByNumber($number, 'faculty');
         $fileName = config('app.json_path') . '/options.json';
         $string = file_get_contents($fileName);
         $data = json_decode($string, true);
@@ -219,22 +223,37 @@ class Person extends Base
         return $this->create($data[$found_key], '', 200);
         // return $data[$found_key];
     }
-    //获取第一步是否提交
-    public function getIsOneStep(Request $request){
+    //判断申请书是否提交
+    // public function getIsOneStep(Request $request)
+    // {
+    //     $tooken_res = $request->data;
+    //     $number = $tooken_res['data']->uuid;
+
+    //     $material_model = new MaterialModel();
+    //     $res = $material_model->selectInfoByNumber($number, 4);
+    //     if ($res !== null) {
+    //         return $this->create(['code' => 1], '', 200);
+    //     } else {
+    //         return $this->create(['code' => 2], '', 200);
+    //     }
+    // }
+    //查询申请进程
+    public function getApplyStep(Request $request)
+    {
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
-
-        $material_model = new MaterialModel();
-        $res=$material_model->selectInfoByNumber($number,4);
-        if($res!==null){
-            return $this->create(['code'=>1], '', 200);
+        $ja_model = new JoinApplyModel();
+        $res = $ja_model->selectApplyStep($number);
+        if ($res !== null) {
+            return $this->create(['step' => $res->step, 'review_status' => $res->review_status], '', 200);
+        } else {
+            return $this->create(['step' => 0, 'review_status' => 1], '', 200);
         }
-        
-
     }
 
 
     /**************************** */
+
 
 
 

@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-10-04 16:28:28
+ * @LastEditTime: 2020-10-22 22:56:55
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Login.php
@@ -18,6 +18,8 @@ use think\Request;
 use app\model\Admin as AdminModel;
 use app\model\EmployeeLogin as EmpModel;
 use app\model\Person as PersonModel;
+
+use app\model\TempCode as TempCodeModel;
 
 use app\model\PersonAccount as PersonAccountModel;
 
@@ -76,7 +78,7 @@ class Login extends Base
         //查询账户对应email
         $admin_email = $admin_model->selectMail($post['username']);
         $title = '登录码';
-        $content = '你好, <b>' . $post['username']. '管理员</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在登录的管理员账户,你的验证码是:' . (string)$code;
+        $content = '你好, <b>' . $post['username'] . '管理员</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在登录的管理员账户,你的验证码是:' . (string)$code;
 
         // $content = '你好, <b>朋友</b>! <br/><br/><span>你的验证码是:' . (string)$code;
         if ($res) {
@@ -151,7 +153,7 @@ class Login extends Base
             } else {
                 return $this->create('', '验证码错误', 204);
             }
-        }else{
+        } else {
             return $this->create('', '账户或密码错误', 204);
         }
     }
@@ -167,7 +169,7 @@ class Login extends Base
         // return json($person_info);
 
         //根据学号从person表里查询数据
-        $person_role = $pa_model->getInfoByNumber($person_info['number'],'role');
+        $person_role = $pa_model->getInfoByNumber($person_info['number'], 'role');
         // $person_name = $pa_model->getInfoByNumber($person_info['number'],'name');
 
         //检查是否为空
@@ -191,12 +193,13 @@ class Login extends Base
             } else {
                 return $this->create('', '未知错误', 204);
             }
-        }else{
+        } else {
             return $this->create('', '账户或密码错误', 204);
         }
     }
 
-    public function selectPersonInfo(Request $request){
+    public function selectPersonInfo(Request $request)
+    {
         $person_model = new PersonModel();
         $res = $request->data;
         // return $this->create($res);
@@ -208,4 +211,98 @@ class Login extends Base
     }
 
 
+
+
+    /**
+     * @description: 发送登录码
+     * @param {type} 
+     * @return {type} 
+     */
+    public function sendHighRolePersonCode()
+    {
+        $post =  request()->param();
+        //PHP获得随机数-验证码
+        $v_code = rand(111111, 999999);
+        //PHP获取时间戳
+        $time = time();
+        //拼接时间戳与登录码
+        $log_code = (string)$time . (string)$v_code;
+        $person_model = new PersonModel();
+        $code_model = new TempCodeModel();
+
+        //删除之前的登录码
+        $code_model->deleteCode($post['number']);
+        //保存登录码信息到临时表
+        $res =  $code_model->saveCode($post['number'], $log_code);
+        //字符串截取指定片段
+        //优化逻辑:$code重复
+        $v_code = substr($log_code, 10, 6);
+        //查询账户对应email
+        $person_info = $person_model->getAllInfoByNumber($post['number']);
+
+        // $person_email = $person_model->getInfoByNumber($post['number'], 'email');
+        $title = '验证码';
+        // $data = json_decode($string, true);
+        $content=emailHtmlModel($person_info['name'],$v_code,'登录' );
+        // return $this->create($content);
+
+        // $content = '你好, <b>' . $person_info['name'] . '</b>管理员! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在登录管理员账户,你的验证码是:' . (string)$v_code;
+
+        // $content = '你好, <b>朋友</b>! <br/><br/><span>你的验证码是:' . (string)$code;
+        if ($res === true) {
+            if (sendMail($person_info['email'], $title, $content)) {
+                $code = 200;
+                $msg = '发送成功';
+            } else {
+                $code = 204;
+                $msg = '发送失败';
+            }
+        } else {
+            $code = 204;
+            $msg = $res;
+        }
+        return $this->create('', $msg, $code);
+    }
+
+    //检查验证码是否正确
+    public function checkHighRolePersonCode()
+    {
+        $post =  request()->param();
+        $person_model = new PersonModel();
+        $code_model = new TempCodeModel();
+        $log_code = $code_model->getCode($post['number']);
+        // return json($log_code);
+        $v_code = substr($log_code, 10, 6);
+        $time = substr($log_code, 0, 10);
+        $now = time();
+        if ($time + config("login.code_timeout") <= $now) {
+            // return $time + 60;
+            return $this->create('', '验证码超时', 201);
+        }
+        $person_info = $person_model->getAllInfoByNumber($post['number']);
+
+        if ($v_code === $post['emailCode']) {
+            $token = signToken($person_info['number'], $person_info['role']);
+            $data = [
+                'token' => $token,
+                // 'name' =>$person_name,
+                'number' => $person_info['number'],
+                'role' => $person_info['role']
+            ];
+            //添加登录记录
+            $records = [
+                'uuid' => $person_info['number'],
+                'login_time' => time(),
+                'login_ip' => request()->host()
+            ];
+            Db::table('login_record')->insert($records);
+            //成功返回token及uuid
+            return $this->create($data, '登录成功');
+        } else {
+            return $this->create('', '验证码错误', 204);
+        }
+    }
+
+
+    //over
 }

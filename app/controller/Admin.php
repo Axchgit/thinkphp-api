@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-09-26 11:31:10
+ * @LastEditTime: 2020-10-24 13:54:37
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -150,6 +150,54 @@ class Admin extends Base
     
         }
 /*************** */
+
+    //一二级管理员浏览人员信息
+    public function viewAllPerson(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        //权限为4需要加查询条件
+        $faculty='';
+        if ($role === 4) {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
+        }
+        // $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $list = $person_model->getAllPerson($post['list_rows'], '', ['query' => $post],$faculty);
+        if ($list) {
+            return $this->create($list, '查询成功');
+        } else {
+            return $this->create($list, '暂无数据', 204);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

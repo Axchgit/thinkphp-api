@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-10-15 00:12:59
+ * @LastEditTime: 2020-10-24 13:57:30
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -44,21 +44,28 @@ Route::group('login', function () {
 })->completeMatch()->prefix('Login/');
 /****员工*****/
 // Route::resource('employee','Employee');
-
+/*******管理员 */
 Route::group('admin', function () {
     
     Route::post('importExcel', 'importExcel')->middleware('checkrequest', 1)->allowCrossDomain();
     Route::get('selectPersonAccount', 'selectPersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
     Route::get('updatePersonAccount', 'updatePersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
     Route::get('deletePersonAccount', 'deletePersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
+    //一二级管理员
+    Route::get('viewAllPerson', 'viewAllPerson')->middleware('checkrequest', 4)->allowCrossDomain();  
+
     
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Admin/');
 
+
+/*******人员 */
 Route::group('person', function () {
     Route::post('uploadApplicatioin', 'uploadApplicatioin')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getPartyBranch', 'getPartyBranch')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getIsOneStep', 'getIsOneStep')->middleware('checkrequest', 8)->allowCrossDomain();
+    Route::get('getApplyStep', 'getApplyStep')->middleware('checkrequest', 8)->allowCrossDomain();
+
     
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Person/');
