@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-10-24 13:54:02
+ * @LastEditTime: 2020-10-25 16:20:02
  * @LastEditors: 罗曼
  */
 
@@ -184,7 +184,7 @@ class Person extends Base
         try {
             validate(['file' => ['filesize:512000', 'fileExt:doc,docx']])
                 ->check(['file' => $file]);
-            $savename = \think\facade\Filesystem::disk('public')->putFile('application', $file);
+            $savename = \think\facade\Filesystem::disk('public')->putFileAs('application', $file,(string)$number.'-入党申请书'.'.'.$file->getOriginalExtension());
             //添加申请书路径到数据库
             $res_add = $material_model->addMaterial($number, 4, '', '', $savename);
             //修改人员党支部数据

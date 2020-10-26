@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-10-16 17:07:18
+ * @LastEditTime: 2020-10-25 20:03:52
  * @LastEditors: 罗曼
  */
 
@@ -39,8 +39,14 @@ class Material extends Model
         }
     }
     //根据学号查询信息
-    public function selectInfoByNumber($number, $key, $value)
+    public function getInfoByNumber($number, $key, $value)
     {
         return $this->where('number', $number)->where($key, $value)->find();
+    }
+
+    //根据学号查询所有数据
+    public function getAllByNumber($number)
+    {
+        return $this->where('number', $number)->select();
     }
 }

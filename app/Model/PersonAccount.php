@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-17 12:09:09
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\PersonAccount.php
- * @LastEditTime: 2020-10-05 18:58:09
+ * @LastEditTime: 2020-10-25 14:50:04
  * @LastEditors: 罗曼
  */
 
@@ -91,6 +91,9 @@ class PersonAccount extends Model
         }
     }
 
+
+    
+
     // 修改人员账户信息
     public function updatePersonAccount($data)
     {
@@ -133,6 +136,9 @@ class PersonAccount extends Model
         // $res = $this->save($data);
     }
     /*************** */
+
+
+
 
 
 

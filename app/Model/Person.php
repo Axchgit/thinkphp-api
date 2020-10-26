@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-10-24 11:02:26
+ * @LastEditTime: 2020-10-25 14:48:08
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -189,21 +189,43 @@ class Person extends Model
     }
     //获取人员信息,分页显示
 
-    public function getAllPerson($list_rows, $isSimple = false, $config,$faculty)
+    public function getAllPerson($list_rows, $isSimple = false, $config, $faculty, $post)
     {
-        if($faculty==''){
-            $data = $this->paginate($list_rows, $isSimple = false, $config);
-
-        }else{
-            $data = $this->where('faculty',$faculty)->paginate($list_rows, $isSimple = false, $config);
+        //知识点:删除指定键名元素
+        $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+        // return $post;
+        if ($faculty == '') {
+            $data = $this->where($post)->paginate($list_rows, $isSimple = false, $config);
+        } else {
+            $data = $this->where($post)->where('faculty', $faculty)->paginate($list_rows, $isSimple = false, $config);
         }
         //判断是否有值
-        if ($data->isEmpty()) {
-            return false;
-        } else {
-            return $data;
+        // if ($data->isEmpty()) {
+        //     return $data;
+        // } else {
+        $fileName = config('app.json_path') . '/options.json';
+        $string = file_get_contents($fileName);
+        $json_data = json_decode($string, true);
+        foreach ($data as $k => $v) {
+
+            // PHP数组查询
+            //学院
+            $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
+            $found_key = array_search($v['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
+            $data[$k]['faculty'] = $json_data[$found_key]['label'];
+            //党支部
+            $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
+            $found_child_key = array_search($v['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标
+            $data[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
         }
+
+        return $data;
+        // }
     }
+
+
+
+
 
 
 

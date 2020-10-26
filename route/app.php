@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-10-24 13:57:30
+ * @LastEditTime: 2020-10-25 18:03:22
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -53,7 +53,7 @@ Route::group('admin', function () {
     Route::get('deletePersonAccount', 'deletePersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
     //一二级管理员
     Route::get('viewAllPerson', 'viewAllPerson')->middleware('checkrequest', 4)->allowCrossDomain();  
-
+    Route::get('reviewApply', 'reviewApply')->middleware('checkrequest', 4)->allowCrossDomain();  
     
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Admin/');

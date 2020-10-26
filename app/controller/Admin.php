@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-10-24 13:54:37
+ * @LastEditTime: 2020-10-25 18:05:53
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -16,10 +16,12 @@ use think\Request;
 
 use app\model\Employee as EmployeeModel;
 use app\model\EmployeeLogin as EmpLoginModel;
+use app\model\JoinApply;
 use app\model\Performance as PerformanceModel;
 
 use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
+use app\model\JoinApply as JoinApplyModel;
 
 
 use think\facade\Db;
@@ -37,7 +39,7 @@ class Admin extends Base
             return $this->create($res, $res, 204);
         }
     }
-/***********人员信息 */
+    /***********人员信息 */
     //查询人员信息
     public function selectPerson()
     {
@@ -48,7 +50,7 @@ class Admin extends Base
         $key = '';
         $value = '';
         // return $val;
-        if($val){
+        if ($val) {
             $key = !empty($post['number']) ? 'number' : 'name';
             $value = urldecode($post[$key]);
             // return $key;
@@ -56,7 +58,7 @@ class Admin extends Base
         // $key = !empty($post['key']) ? $post['key'] : '';
         // $value = !empty($post['value']) ? $post['value'] : '';
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $data = $person_model->selectPerson( $key, $value, $list_rows, false, ['query' => $post]);
+        $data = $person_model->selectPerson($key, $value, $list_rows, false, ['query' => $post]);
         if ($data) {
             return $this->create($data, '查询成功');
         } else {
@@ -65,7 +67,8 @@ class Admin extends Base
     }
 
     //修改人员信息
-    public function updatePerson(){
+    public function updatePerson()
+    {
         $post =  request()->param();
         $person_model = new PersonModel();
         $res = $person_model->updatePerson($post);
@@ -77,7 +80,8 @@ class Admin extends Base
     }
 
     //修改人员信息
-    public function deletePerson(){
+    public function deletePerson()
+    {
         $post =  request()->param();
         $person_model = new PersonModel();
         $res = $person_model->deletePerson($post['id']);
@@ -86,91 +90,114 @@ class Admin extends Base
         } else {
             return $this->create('', $res, 204);
         }
-
     }
 
-/***********人员账户信息 */
-        //查询人员账户
-        public function selectPersonAccount()
-        {
-            $post =  request()->param();
-            // $res = $request->data;
-            $person_model = new PersonModel();
-            $pa_model = new PersonAccountModel();
-            $val = !empty($post['number']) || !empty($post['name']);
-            $key = '';
-            $value = '';
-            // return $val;
-            if($val){
-                $key = !empty($post['number']) ? 'number' : 'name';
-                $value = urldecode($post[$key]);
-                // return $key;
-            }
-            // $key = !empty($post['key']) ? $post['key'] : '';
-            // $value = !empty($post['value']) ? $post['value'] : '';
-            $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-            $resArr = $pa_model->selectPersonAccount( $key, $value, $list_rows, false, ['query' => $post]);
-            foreach($resArr as $k=>$v){
-                $person_info = $person_model->getAllInfoByNumber($v['number']);
-                $resArr[$k]['name'] = $person_info['name'];
-                $resArr[$k]['role'] = $person_info['role'];
-                $resArr[$k]['post'] = $person_info['post'];
-                $resArr[$k]['phone_number'] = $person_info['phone_number'];
-                $resArr[$k]['comment'] = $person_info['comment'];
-            }
-            if ($resArr) {
-                return $this->create($resArr, '查询成功');
-            } else {
-                return $this->create('', '暂无数据', 204);
-            }
+    /***********人员账户信息 */
+    //查询人员账户
+    public function selectPersonAccount()
+    {
+        $post =  request()->param();
+        // $res = $request->data;
+        $person_model = new PersonModel();
+        $pa_model = new PersonAccountModel();
+        $val = !empty($post['number']) || !empty($post['name']);
+        $key = '';
+        $value = '';
+        // return $val;
+        if ($val) {
+            $key = !empty($post['number']) ? 'number' : 'name';
+            $value = urldecode($post[$key]);
+            // return $key;
         }
-    
-        //修改人员账户
-        public function updatePersonAccount(){
-            $post =  request()->param();
-            $pa_model = new PersonAccountModel();
-            $res = $pa_model->updatePersonAccount($post);
-            if ($res === true) {
-                return $this->create('', '修改成功', 200);
-            } else {
-                return $this->create('', $res, 204);
-            }
+        // $key = !empty($post['key']) ? $post['key'] : '';
+        // $value = !empty($post['value']) ? $post['value'] : '';
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $resArr = $pa_model->selectPersonAccount($key, $value, $list_rows, false, ['query' => $post]);
+        foreach ($resArr as $k => $v) {
+            $person_info = $person_model->getAllInfoByNumber($v['number']);
+            $resArr[$k]['name'] = $person_info['name'];
+            $resArr[$k]['role'] = $person_info['role'];
+            $resArr[$k]['post'] = $person_info['post'];
+            $resArr[$k]['phone_number'] = $person_info['phone_number'];
+            $resArr[$k]['comment'] = $person_info['comment'];
         }
-    
-        //删除人员账户
-        public function deletePersonAccount(){
-            $post =  request()->param();
-            $pa_model = new PersonAccountModel();
-            $res = $pa_model->deletePersonAccount($post['id']);
-            if ($res === true) {
-                return $this->create('', '人员信息删除成功', 200);
-            } else {
-                return $this->create('', $res, 204);
-            }
-    
+        if ($resArr) {
+            return $this->create($resArr, '查询成功');
+        } else {
+            return $this->create('', '暂无数据', 204);
         }
-/*************** */
+    }
+
+    //修改人员账户
+    public function updatePersonAccount()
+    {
+        $post =  request()->param();
+        $pa_model = new PersonAccountModel();
+        $res = $pa_model->updatePersonAccount($post);
+        if ($res === true) {
+            return $this->create('', '修改成功', 200);
+        } else {
+            return $this->create('', $res, 204);
+        }
+    }
+
+    //删除人员账户
+    public function deletePersonAccount()
+    {
+        $post =  request()->param();
+        $pa_model = new PersonAccountModel();
+        $res = $pa_model->deletePersonAccount($post['id']);
+        if ($res === true) {
+            return $this->create('', '人员信息删除成功', 200);
+        } else {
+            return $this->create('', $res, 204);
+        }
+    }
+    /*************** */
 
     //一二级管理员浏览人员信息
     public function viewAllPerson(Request $request)
     {
         $post = request()->param();
+
+        // return json($post);
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         $role = $tooken_res['data']->role;
         $person_model = new PersonModel();
         //权限为4需要加查询条件
-        $faculty='';
+        $faculty = '';
         if ($role === 4) {
             $faculty = $person_model->getInfoByNumber($number, 'faculty');
         }
-        // $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $list = $person_model->getAllPerson($post['list_rows'], '', ['query' => $post],$faculty);
-        if ($list) {
-            return $this->create($list, '查询成功');
-        } else {
-            return $this->create($list, '暂无数据', 204);
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $list = $person_model->getAllPerson($list_rows, '', ['query' => $post], $faculty, $post);
+        // if ($list) {
+        return $this->create($list, '查询成功');
+        // } else {
+        //     return $this->create($list, '暂无数据');
+        // }
+    }
+
+    //审核申请
+    public function reviewApply(Request $request){
+        $post = request()->param();
+
+        // return json($post);
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $ja_model = new JoinApplyModel();
+        //权限为4需要加查询条件
+        $faculty = '';
+        if ($role === 4) {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
         }
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $list = $ja_model->getAllApply($list_rows, '', ['query' => $post], $faculty, $post);
+        return $this->create($list, '查询成功');
+
     }
 
 
@@ -201,7 +228,7 @@ class Admin extends Base
 
 
 
-    
+
 
     //TODO:删除
     /************************************* */
