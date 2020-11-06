@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-10-14 17:28:59
+ * @LastEditTime: 2020-11-03 15:36:43
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Test.php
@@ -22,10 +22,14 @@ use think\facade\Db;
 use app\model\Goods as GoodsModel;
 use app\model\GoodsTemp as GoodsTempModel;
 
+use app\model\RecruitPartyMember as RecruitPartyMemberModel;
+
+
 
 
 class Test extends Base
 {
+    
     public function night()
     {
         $fileName = config('app.json_path') . '/options.json';
@@ -74,8 +78,14 @@ class Test extends Base
     }
     public function testTwo()
     {
+        $rpm_model = new RecruitPartyMemberModel();
+
+
         // $admin_model = new AdminModel();
         // $data = $admin_model->deleteLogcode('呵粑粑牛');
+        $test= '2020-11-02 22:46:48';
+        return $rpm_model->testOne();
+        return date("Y-m-d H:i:s")<$test;
         return time();
     }
     //获取一个uuid

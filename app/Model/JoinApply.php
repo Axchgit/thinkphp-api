@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-10-26 19:32:46
+ * @LastEditTime: 2020-10-28 00:12:16
  * @LastEditors: 罗曼
  */
 
@@ -54,8 +54,7 @@ class JoinApply extends Model
 
     }
 
-    //获取人员信息,分页显示
-
+    //获取人员信息,分页显示 
     public function getAllApply($list_rows, $isSimple = false, $config, $faculty, $post)
     {
         $person_model = new PersonModel();
@@ -106,9 +105,9 @@ class JoinApply extends Model
             $data[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
 
             /************审核资料*/
-            $data[$k]['certificate_one'] = !empty($material_path_info[0]['score']) ? $material_path_info[3]['score'] : '';
-            $data[$k]['certificate_two'] = !empty($material_path_info[1]['score']) ? $material_path_info[1]['score'] : '';
-            $data[$k]['certificate_three'] = !empty($material_path_info[2]['score']) ? $material_path_info[2]['score'] : '';
+            $data[$k]['certificate_one'] = !empty($material_path_info[0]['score']) ? $material_path_info[3]['score'] : '未认证';
+            $data[$k]['certificate_two'] = !empty($material_path_info[1]['score']) ? $material_path_info[1]['score'] : '未认证';
+            $data[$k]['certificate_three'] = !empty($material_path_info[2]['score']) ? $material_path_info[2]['score'] : '未认证';
             $data[$k]['applicationPath'] = !empty($material_path_info[3]['remarks']) ? $material_path_info[3]['remarks'] : '';
         }
         // $data['material'] = $material;
@@ -118,42 +117,17 @@ class JoinApply extends Model
         // }
     }
 
-
-    public function getAllApplyOneStep($list_rows, $isSimple = false, $config, $faculty, $post)
+    //修改/审核申请
+    public function updateJoinApply($data)
     {
-        //知识点:删除指定键名元素
-        $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
-        // return $post;
-        // if ($faculty == '') {
-        $data = $this->where($post)->paginate($list_rows, $isSimple = false, $config);
-        // } else {
-        //     $data = $this->where($post)->where('faculty', $faculty)->paginate($list_rows, $isSimple = false, $config);
-        // }
-        //判断是否有值
-        // if ($data->isEmpty()) {
-        //     return $data;
-        // } else {
-        // $fileName = config('app.json_path') . '/options.json';
-        // $string = file_get_contents($fileName);
-        // $json_data = json_decode($string, true);
-        foreach ($data as $k => $v) {
-            // $data[$k]['number']
-
-
-            // PHP数组查询
-            //学院
-            // $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
-            // $found_key = array_search($v['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
-            // $data[$k]['faculty'] = $json_data[$found_key]['label'];
-            // //党支部
-            // $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
-            // $found_child_key = array_search($v['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标
-            // $data[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
+        try {
+            $this->update($data,['id'=>$data['id']],['step','review_status','reviewer','remarks']);  //只允许第二个参数内的值被修改
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
-
-        return $data;
-        // }
     }
+    
 
 
 

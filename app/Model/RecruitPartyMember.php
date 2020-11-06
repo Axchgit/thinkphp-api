@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-10-28 16:42:55
+ * @LastEditTime: 2020-11-03 21:05:53
  * @LastEditors: 罗曼
  */
 
@@ -54,7 +54,11 @@ class RecruitPartyMember extends Model
         $fileName = config('app.json_path') . '/options.json';
         $string = file_get_contents($fileName);
         $json_data = json_decode($string, true);
-        $data = $this->where($post)
+        //获取当前时间
+        $now = date("Y-m-d H:i:s");
+        $data = $this
+            ->where('stage_time', '<', $now)
+            ->where($post)
             ->distinct(true)
             ->group('number')
             ->paginate($list_rows, $isSimple, $config);
@@ -73,7 +77,7 @@ class RecruitPartyMember extends Model
             $data[$k]['native_place'] = $person_info['native_place'];
             $data[$k]['id_card'] = $person_info['id_card'];
             $data[$k]['phone_number'] = $person_info['phone_number'];
-            $data[$k]['politival_status'] = $person_info['role'];
+            $data[$k]['politival_status'] = $person_info['political_status'];
             //学院
             $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
             $found_key = array_search($person_info['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
@@ -84,8 +88,8 @@ class RecruitPartyMember extends Model
             $data[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
             /************发展党员信息*/
             for ($i = 0; $i <= 8; $i++) {
-                $recruit_info[$i] = $this->where('number', $v['number'])->where('stage', $i + 1)->find();
-                $data[$k]['stage' . $i] = $recruit_info[$i]['stage_time'];
+                $recruit_info[$i] = $this->where('number', $v['number'])->where('stage', $i + 1)->where('stage_time', '<', $now)->find();
+                $data[$k]['stage' . $i] = substr($recruit_info[$i]['stage_time'], 0, 10);
                 if (!empty($recruit_info[$i]['contacts'])) {
                     $data[$k]['contacts_is'] = $recruit_info[$i]['contacts'];
                 }
@@ -101,6 +105,16 @@ class RecruitPartyMember extends Model
     public function getAllByNumber($number)
     {
         return $this->where('number', $number)->select();
+    }
+
+
+    public function testOne()
+    {
+        $now = date("Y-m-d H:i:s");
+
+        $data = $this
+            ->where('stage_time', '>', $now)->select();
+        return $data;
     }
 
 

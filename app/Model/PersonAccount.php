@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-17 12:09:09
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\PersonAccount.php
- * @LastEditTime: 2020-10-25 14:50:04
+ * @LastEditTime: 2020-11-01 18:47:33
  * @LastEditors: 罗曼
  */
 
@@ -91,8 +91,49 @@ class PersonAccount extends Model
         }
     }
 
+    //获取人员信息,分页显示
 
-    
+    public function getAllPersonAccount($list_rows, $config, $faculty, $post, $isSimple = false)
+    {
+        //删除指定键名元素
+        $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+
+        $person_model = new PersonModel();
+
+        $list = $this->where($post)->paginate($list_rows, $isSimple, $config);
+        //获取json文件数据
+        $fileName = config('app.json_path') . '/options.json';
+        $string = file_get_contents($fileName);
+        $json_data = json_decode($string, true);
+        //拼装返回数据
+        foreach ($list as $k => $v) {
+            $person_info = $person_model->getAllInfoByNumber($v['number']);  //获取人员信息
+            //二级管理员查看时剔除非本学院人员信息
+            if ($faculty == 4 && $faculty == $person_info['faculty']) {
+                unset($data[$k]);
+                continue;
+            }
+            $list[$k]['name']=$person_info['name'];
+            $list[$k]['role']=$person_info['role'];
+
+            // PHP数组查询
+            //学院
+            $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
+            $found_key = array_search($v['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
+            $list[$k]['faculty'] = $json_data[$found_key]['label'];
+            //党支部
+            $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
+            $found_child_key = array_search($v['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标
+            $list[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
+        }
+
+        return $list;
+        // }
+    }
+
+
+
+
 
     // 修改人员账户信息
     public function updatePersonAccount($data)
@@ -109,7 +150,6 @@ class PersonAccount extends Model
     // 修改人员信息
     public function deletePersonAccount($id)
     {
-
         try {
             //软删除
             $number = $this->where('id', $id)->value('number');
@@ -123,7 +163,6 @@ class PersonAccount extends Model
         } catch (\Exception $e) {
             return $e->getMessage();
         }
-
         try {
             //软删除
             $this->destroy($id);

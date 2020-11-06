@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-10-25 18:03:22
+ * @LastEditTime: 2020-11-01 18:29:18
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -53,8 +53,10 @@ Route::group('admin', function () {
     Route::get('deletePersonAccount', 'deletePersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
     //一二级管理员
     Route::get('viewAllPerson', 'viewAllPerson')->middleware('checkrequest', 4)->allowCrossDomain();  
-    Route::get('reviewApply', 'reviewApply')->middleware('checkrequest', 4)->allowCrossDomain();  
-    
+    Route::get('viewApply', 'viewApply')->middleware('checkrequest', 4)->allowCrossDomain();  
+    Route::post('reviewApply', 'reviewApply')->middleware('checkrequest', 4)->allowCrossDomain();  
+    Route::get('viewRecruit', 'viewRecruit')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('viewAllPersonAccount', 'viewAllPersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Admin/');
 
@@ -65,7 +67,7 @@ Route::group('person', function () {
     Route::get('getPartyBranch', 'getPartyBranch')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getIsOneStep', 'getIsOneStep')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getApplyStep', 'getApplyStep')->middleware('checkrequest', 8)->allowCrossDomain();
-
+    
     
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Person/');

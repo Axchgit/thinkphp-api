@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-10-25 18:05:53
+ * @LastEditTime: 2020-11-03 21:13:53
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -22,6 +22,7 @@ use app\model\Performance as PerformanceModel;
 use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
 use app\model\JoinApply as JoinApplyModel;
+use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 
 
 use think\facade\Db;
@@ -179,8 +180,35 @@ class Admin extends Base
         // }
     }
 
-    //审核申请
-    public function reviewApply(Request $request){
+    //一二级管理员浏览人员账户信息
+    public function viewAllPersonAccount(Request $request)
+    {
+        $post = request()->param();
+
+        // return json($post);
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
+        $person_model = new PersonModel();
+        $pa_model = new PersonAccountModel();
+        //权限为4需要加查询条件
+        $faculty = '';
+        if ($role === 4) {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
+        }
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $list = $pa_model->getAllPersonAccount($list_rows,  ['query' => $post], $faculty, $post);
+        // if ($list) {
+        return $this->create($list, '查询成功');
+        // } else {
+        //     return $this->create($list, '暂无数据');
+        // }
+    }
+
+    //浏览查询申请列表
+    public function viewApply(Request $request)
+    {
         $post = request()->param();
 
         // return json($post);
@@ -197,7 +225,79 @@ class Admin extends Base
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
         $list = $ja_model->getAllApply($list_rows, '', ['query' => $post], $faculty, $post);
         return $this->create($list, '查询成功');
+    }
 
+    //审核申请
+    public function reviewApply(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $post = request()->param();
+        // $person_model = new PersonModel();
+        $ja_model = new JoinApplyModel();
+        $rpm_model = new RecruitPartyMemberModel();
+
+
+        $post['reviewer'] = $number;
+        $post['remarks'] = '';
+        $ja_res = $ja_model->updateJoinApply($post);
+        // $post['stage'] = $post['step'] == 1 ? 1 : $post['step'] + 2;
+
+        switch ($post['step']) {
+            case 1:
+                $post['stage'] = 1;
+                $rpm_res = $rpm_model->createRecruit($post);
+                if ($rpm_res === true) {
+                    $post['stage'] = 2;
+                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+3 month"));
+                    $rpm_res = $rpm_model->createRecruit($post);
+                }
+                break;
+            case 5:
+                $post['stage'] = 8;
+                # code...
+                break;
+            default:
+                $post['stage'] =  $post['step'] + 2;
+                break;
+        }
+
+        //当审核未通过时,删除发展党员信息
+        if ($post['review_status'] != 2) {
+            $rpm_res = $rpm_model->deleteRecruit(['number' => $post['number']], ['stage' => $post['stage']]);
+            return $this->create($post, $rpm_res);
+        }
+
+
+
+        if ($ja_res === true && $rpm_res === true) {
+            return $this->create($post,  '审核成功');
+        } else {
+            return $this->create($post, ['审核失败', $ja_res, $rpm_res], 204);
+        }
+    }
+
+    //浏览查询申请列表
+    public function viewRecruit(Request $request)
+    {
+        $post = request()->param();
+
+        // return json($post);
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $ja_model = new JoinApplyModel();
+        $rpm_model = new RecruitPartyMemberModel();
+
+        //权限为4需要加查询条件
+        $faculty = '';
+        if ($role === 4) {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
+        }
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post);
+        return $this->create($list, '查询成功');
     }
 
 
