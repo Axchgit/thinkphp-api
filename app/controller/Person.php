@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-10-25 16:20:02
+ * @LastEditTime: 2020-11-08 15:41:06
  * @LastEditors: 罗曼
  */
 
@@ -172,8 +172,10 @@ class Person extends Base
     /**************************** */
 
     /**************************** 文件上传*/
-    public function uploadApplicatioin(Request $request)
+    public function submitApplicatioin(Request $request)
     {
+        $post = request()->param();
+        // return $this->create('', $post, 204);
         $file = request()->file('file');
         $branch_value = request()->header('partyBranch');
         $tooken_res = $request->data;
@@ -181,24 +183,40 @@ class Person extends Base
         $person_model = new PersonModel();
         $material_model = new MaterialModel();
         $ja_model = new JoinApplyModel();
-        try {
-            validate(['file' => ['filesize:512000', 'fileExt:doc,docx']])
-                ->check(['file' => $file]);
-            $savename = \think\facade\Filesystem::disk('public')->putFileAs('application', $file,(string)$number.'-入党申请书'.'.'.$file->getOriginalExtension());
-            //添加申请书路径到数据库
-            $res_add = $material_model->addMaterial($number, 4, '', '', $savename);
-            //修改人员党支部数据
-            $res_update = $person_model->updateByNumber($number, ['party_branch' => $branch_value]);
-            //添加申请信息
-            $res_ja = $ja_model->addApply($number, 1);
-            if ($res_add === true && $res_update === true && $res_ja === true) {
-                return $this->create('', '申请成功', 200);
-            } else {
-                return $this->create('', [$res_add, $res_update, $res_ja], 204);
+        if (!empty($post['step'])) {
+            switch ($post['step']) {
+                case 2:
+                    
+                    break;
+                
+                default:
+                    # code...
+                    break;
             }
-            // return $this->create($savename, '上传成功', 200);
-        } catch (\think\exception\ValidateException $e) {
-            return $this->create('', $e->getMessage(), 204);
+            $res_ja = $ja_model->addApply($number, $post['step']);
+            $res_update = true;
+            $res_mat = true;
+        } else {
+            try {
+                validate(['file' => ['filesize:512000', 'fileExt:doc,docx']])
+                    ->check(['file' => $file]);
+                $savename = \think\facade\Filesystem::disk('public')->putFileAs('application', $file, (string)$number . '-入党申请书' . '.' . $file->getOriginalExtension());
+                //添加申请书路径到数据库
+                $res_mat = $material_model->addMaterial($number, 4, '', '', $savename);
+                //修改人员党支部数据
+                $res_update = $person_model->updateByNumber($number, ['party_branch' => $branch_value]);
+                //添加申请信息
+                $res_ja = $ja_model->addApply($number, 1);
+                // return $this->create($savename, '上传成功', 200);
+            } catch (\think\exception\ValidateException $e) {
+                return $this->create('', $e->getMessage(), 204);
+            }
+        }
+
+        if ($res_mat === true && $res_update === true && $res_ja === true) {
+            return $this->create('', '申请成功', 200);
+        } else {
+            return $this->create('', [$res_mat, $res_update, $res_ja], 204);
         }
     }
     /**************************** */

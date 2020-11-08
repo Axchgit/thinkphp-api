@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-03 21:13:53
+ * @LastEditTime: 2020-11-08 15:36:26
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -253,18 +253,44 @@ class Admin extends Base
                     $rpm_res = $rpm_model->createRecruit($post);
                 }
                 break;
+            case 2:
+                $post['stage'] = 4;
+                $rpm_res = $rpm_model->createRecruit($post);
+                if ($rpm_res === true) {
+                    $post = array_diff_key($post, ["contacts" => 0, "introducer" => 0]);
+                    $post['stage'] = 3;
+                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("-15 day"));
+                    $rpm_res = $rpm_model->createRecruit($post);
+                }
+                break;
+            case 3:
+                $post['stage'] = 5;
+                $rpm_res = $rpm_model->createRecruit($post);
+                break;
+            case 4:
+                $post['stage'] = 6;
+                $rpm_res = $rpm_model->createRecruit($post);
+                if ($rpm_res === true) {
+                    $post['stage'] = 7;
+                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+7 day"));
+                    $rpm_res = $rpm_model->createRecruit($post);
+                }
+                break;
             case 5:
                 $post['stage'] = 8;
+                $rpm_res = $rpm_model->createRecruit($post);
+                if ($rpm_res === true) {
+                    $post['stage'] = 9;
+                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+7 day"));
+                    $rpm_res = $rpm_model->createRecruit($post);
+                }
                 # code...
-                break;
-            default:
-                $post['stage'] =  $post['step'] + 2;
                 break;
         }
 
         //当审核未通过时,删除发展党员信息
         if ($post['review_status'] != 2) {
-            $rpm_res = $rpm_model->deleteRecruit(['number' => $post['number']], ['stage' => $post['stage']]);
+            $rpm_res = $rpm_model->deleteRecruit([['number', '=', $post['number']], ['stage', '>=', $post['stage']]]);
             return $this->create($post, $rpm_res);
         }
 

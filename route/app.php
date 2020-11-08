@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-01 18:29:18
+ * @LastEditTime: 2020-11-08 13:47:02
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -63,7 +63,7 @@ Route::group('admin', function () {
 
 /*******人员 */
 Route::group('person', function () {
-    Route::post('uploadApplicatioin', 'uploadApplicatioin')->middleware('checkrequest', 8)->allowCrossDomain();
+    Route::post('submitApplicatioin', 'submitApplicatioin')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getPartyBranch', 'getPartyBranch')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getIsOneStep', 'getIsOneStep')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getApplyStep', 'getApplyStep')->middleware('checkrequest', 8)->allowCrossDomain();
