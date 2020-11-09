@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-09 08:43:52
+ * @LastEditTime: 2020-11-09 10:26:45
  * @LastEditors: 罗曼
  */
 
@@ -183,16 +183,22 @@ class Person extends Base
         $person_model = new PersonModel();
         $material_model = new MaterialModel();
         $ja_model = new JoinApplyModel();
+        $rpm_model = new RecruitPartyMemberModel();
         //TODO:用户提交申请验证合法性
         if (!empty($post['step'])) {
             switch ($post['step']) {
                 case 2:
-                    
+                    // if ($rpm_model->getIsExceedNow($number)) {
+                    //     return $this->create('', '请注意申请时间', 204);
+                    // }
                     break;
-                
+
                 default:
                     # code...
                     break;
+            }
+            if ($rpm_model->getIsExceedNow($number)) {
+                return $this->create(['isExceed'=>true], '请注意申请时间', 200);
             }
             $res_ja = $ja_model->addApply($number, $post['step']);
             $res_update = true;

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-11-03 21:05:53
+ * @LastEditTime: 2020-11-09 10:15:56
  * @LastEditors: 罗曼
  */
 
@@ -102,9 +102,21 @@ class RecruitPartyMember extends Model
         }
         return $data;
     }
+    //通过学工号获取信息
     public function getAllByNumber($number)
     {
         return $this->where('number', $number)->select();
+    }
+    //查询是否有超过当前日期的信息
+    public function getIsExceedNow($number)
+    {
+        $now = date("Y-m-d H:i:s");
+        $count = $this->where('number', $number)->where('stage_time', '>', $now)->count();
+        if($count>=1){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 
@@ -116,6 +128,8 @@ class RecruitPartyMember extends Model
             ->where('stage_time', '>', $now)->select();
         return $data;
     }
+
+
 
 
 
