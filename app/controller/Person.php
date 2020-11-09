@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-08 15:41:06
+ * @LastEditTime: 2020-11-09 08:43:52
  * @LastEditors: 罗曼
  */
 
@@ -183,6 +183,7 @@ class Person extends Base
         $person_model = new PersonModel();
         $material_model = new MaterialModel();
         $ja_model = new JoinApplyModel();
+        //TODO:用户提交申请验证合法性
         if (!empty($post['step'])) {
             switch ($post['step']) {
                 case 2:
