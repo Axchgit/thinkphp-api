@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-08 15:36:26
+ * @LastEditTime: 2020-11-09 20:19:56
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -33,6 +33,8 @@ class Admin extends Base
     {
         $post =  request()->param();
         $person_model = new PersonModel();
+        // return $this->create($post, '90', 204);
+        
         $res = $person_model->insertPerson($post);
         if ($res === true) {
             return $this->create('', '添加成功', 200);
