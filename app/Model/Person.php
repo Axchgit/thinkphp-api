@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-10-25 14:48:08
+ * @LastEditTime: 2020-11-10 00:25:21
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -57,10 +57,11 @@ class Person extends Model
             }
         }
         // }
+
         Db::startTrans();
         try {
             if (!empty($person)) {
-                $pt_mode->limit(100)->insertAll($person);
+                $pt_mode->saveAll($person);
             } else {
                 // Db::rollback();
                 return false;
@@ -69,18 +70,19 @@ class Person extends Model
             $same = Db::view('person')
                 ->view('person_temp', 'name', 'person.number = person_temp.number')
                 ->select();
-            //删除表里的重复数据
+            //删除临时表里的重复数据
             foreach ($same as $k => $v) {
-                Db::table('person')->where('number', $v['number'])->delete();
+                Db::table('person_temp')->where('number', $v['number'])->delete();
             }
             //查询临时表数据
             //知识点:查询时忽略某个字段
             $data = Db::table('person_temp')->withoutField('id')->select()->toArray();
             if (empty($data)) {
                 // Db::rollback();
-                return '临时表数据为空';
+                return '没有新数据';
             }
             $res = $this->limit(100)->insertAll($data);
+
             if ($res) {
                 Db::table('person_temp')->delete(true);
                 Db::commit();
@@ -92,7 +94,7 @@ class Person extends Model
         } catch (\Exception  $e) {
             Db::rollback();
             // return '插入goods表失败';
-            return $e . 'catch';
+            return $e->getMessage() . 'catch';
         }
     }
     //查询person
@@ -125,10 +127,11 @@ class Person extends Model
     public function updatePerson($data)
     {
         try {
+            $data = request()->only(['id','role']);
             $this->update($data);
             return true;
         } catch (\Exception $e) {
-            return $e;
+            return $e->getMessage();
         }
         // $res = $this->save($data);
     }

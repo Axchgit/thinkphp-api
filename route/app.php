@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-09 19:40:48
+ * @LastEditTime: 2020-11-10 00:10:00
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -48,9 +48,11 @@ Route::group('login', function () {
 Route::group('admin', function () {
     
     Route::post('importExcel', 'importExcel')->middleware('checkrequest', 3)->allowCrossDomain();
-    Route::get('selectPersonAccount', 'selectPersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
-    Route::get('updatePersonAccount', 'updatePersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
-    Route::get('deletePersonAccount', 'deletePersonAccount')->middleware('checkrequest', 1)->allowCrossDomain();
+    Route::get('selectPersonAccount', 'selectPersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('updatePersonAccount', 'updatePersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('deletePersonAccount', 'deletePersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('updatePerson', 'updatePerson')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('deletePerson', 'deletePerson')->middleware('checkrequest', 4)->allowCrossDomain();
     //一二级管理员
     Route::get('viewAllPerson', 'viewAllPerson')->middleware('checkrequest', 4)->allowCrossDomain();  
     Route::get('viewApply', 'viewApply')->middleware('checkrequest', 4)->allowCrossDomain();  
