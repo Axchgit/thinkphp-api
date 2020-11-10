@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-09 23:46:52
+ * @LastEditTime: 2020-11-10 20:11:40
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -225,7 +225,7 @@ class Admin extends Base
             $faculty = $person_model->getInfoByNumber($number, 'faculty');
         }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $list = $ja_model->getAllApply($list_rows, '', ['query' => $post], $faculty, $post);
+        $list = $ja_model->getAllApply($list_rows, ['query' => $post], $faculty, $post,$role);
         return $this->create($list, '查询成功');
     }
 
@@ -315,7 +315,6 @@ class Admin extends Base
         $number = $tooken_res['data']->uuid;
         $role = $tooken_res['data']->role;
         $person_model = new PersonModel();
-        $ja_model = new JoinApplyModel();
         $rpm_model = new RecruitPartyMemberModel();
 
         //权限为4需要加查询条件
@@ -324,7 +323,7 @@ class Admin extends Base
             $faculty = $person_model->getInfoByNumber($number, 'faculty');
         }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post);
+        $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post,$role );
         return $this->create($list, '查询成功');
     }
 

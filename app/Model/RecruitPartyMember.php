@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-11-09 10:15:56
+ * @LastEditTime: 2020-11-10 20:12:01
  * @LastEditors: 罗曼
  */
 
@@ -45,7 +45,7 @@ class RecruitPartyMember extends Model
         }
     }
     //获取人员信息,分页显示 
-    public function getRecruit($list_rows, $config, $faculty, $post, $isSimple = false)
+    public function getRecruit($list_rows, $config, $faculty, $post, $role, $isSimple = false)
     {
         //删除指定键名元素
         $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
@@ -65,7 +65,7 @@ class RecruitPartyMember extends Model
         foreach ($data as $k => $v) {
             $person_info = $person_model->getAllInfoByNumber($v['number']);  //获取人员信息
             //二级管理员查看时剔除非本学院人员信息
-            if ($faculty == 4 && $faculty == $person_info['faculty']) {
+            if ($role == 4 && $faculty !== $person_info['faculty']) {
                 unset($data[$k]);
                 continue;
             }
@@ -112,9 +112,9 @@ class RecruitPartyMember extends Model
     {
         $now = date("Y-m-d H:i:s");
         $count = $this->where('number', $number)->where('stage_time', '>', $now)->count();
-        if($count>=1){
+        if ($count >= 1) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }

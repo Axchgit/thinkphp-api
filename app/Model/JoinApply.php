@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-10-28 00:12:16
+ * @LastEditTime: 2020-11-10 20:10:29
  * @LastEditors: 罗曼
  */
 
@@ -55,7 +55,7 @@ class JoinApply extends Model
     }
 
     //获取人员信息,分页显示 
-    public function getAllApply($list_rows, $isSimple = false, $config, $faculty, $post)
+    public function getAllApply($list_rows, $config, $faculty, $post,$role, $isSimple = false)
     {
         $person_model = new PersonModel();
         $material_model = new MaterialModel();
@@ -64,7 +64,7 @@ class JoinApply extends Model
         $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
         // return $post;
         // if ($faculty == '') {
-        $data = $this->where($post)->paginate($list_rows, $isSimple = false, $config);
+        $data = $this->where($post)->paginate($list_rows, $isSimple, $config);
         // } else {
         //     $data = $this->where($post)->where('faculty', $faculty)->paginate($list_rows, $isSimple = false, $config);
         // }
@@ -82,7 +82,7 @@ class JoinApply extends Model
                 $material_path_info[$i] = $material_model->getInfoByNumber($data[$k]['number'], 'category', $i + 1); //获取审核资料
             }
             //二级管理员查看时剔除非本学院人员信息
-            if ($faculty == 4 && $faculty == $person_info['faculty']) {
+            if ($role == 4 && $faculty !== $person_info['faculty']) {
                 unset($data[$k]);
                 continue;
             }
