@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-11-10 20:12:01
+ * @LastEditTime: 2020-11-10 20:44:56
  * @LastEditors: 罗曼
  */
 
@@ -78,10 +78,12 @@ class RecruitPartyMember extends Model
             $data[$k]['id_card'] = $person_info['id_card'];
             $data[$k]['phone_number'] = $person_info['phone_number'];
             $data[$k]['politival_status'] = $person_info['political_status'];
+            $data[$k]['faculty'] = (int)($person_info['faculty']);
+
             //学院
             $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
             $found_key = array_search($person_info['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
-            $data[$k]['faculty'] = $json_data[$found_key]['label'];
+            // $data[$k]['faculty'] = $json_data[$found_key]['label'];
             //党支部
             $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
             $found_child_key = array_search($person_info['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-11-10 20:10:29
+ * @LastEditTime: 2020-11-10 20:54:36
  * @LastEditors: 罗曼
  */
 
@@ -55,16 +55,16 @@ class JoinApply extends Model
     }
 
     //获取人员信息,分页显示 
-    public function getAllApply($list_rows, $config, $faculty, $post,$role, $isSimple = false)
+    public function getAllApply($list_rows, $config, $faculty, $post, $role, $isSimple = false)
     {
         $person_model = new PersonModel();
         $material_model = new MaterialModel();
 
         //知识点:删除指定键名元素
-        $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+        $post_select = array_diff_key($post, ["list_rows" => 0, "page" => 0,'faculty'=>-1]);
         // return $post;
         // if ($faculty == '') {
-        $data = $this->where($post)->paginate($list_rows, $isSimple, $config);
+        $data = $this->where($post_select)->paginate($list_rows, $isSimple, $config);
         // } else {
         //     $data = $this->where($post)->where('faculty', $faculty)->paginate($list_rows, $isSimple = false, $config);
         // }
@@ -82,7 +82,7 @@ class JoinApply extends Model
                 $material_path_info[$i] = $material_model->getInfoByNumber($data[$k]['number'], 'category', $i + 1); //获取审核资料
             }
             //二级管理员查看时剔除非本学院人员信息
-            if ($role == 4 && $faculty !== $person_info['faculty']) {
+            if (($role == 4 && $faculty !== $person_info['faculty']) || (!empty($post['faculty']) && $post['faculty'] !== $person_info['faculty'])) {
                 unset($data[$k]);
                 continue;
             }
@@ -93,12 +93,13 @@ class JoinApply extends Model
             $data[$k]['nation'] = $person_info['nation'];
             $data[$k]['email'] = $person_info['email'];
             $data[$k]['role'] = $person_info['role'];
+            $data[$k]['faculty'] = (int)($person_info['faculty']);
 
 
             //学院
             $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
             $found_key = array_search($person_info['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
-            $data[$k]['faculty'] = $json_data[$found_key]['label'];
+            // $data[$k]['faculty'] = $json_data[$found_key]['label'];
             //党支部
             $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
             $found_child_key = array_search($person_info['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标
@@ -121,13 +122,13 @@ class JoinApply extends Model
     public function updateJoinApply($data)
     {
         try {
-            $this->update($data,['id'=>$data['id']],['step','review_status','reviewer','remarks']);  //只允许第二个参数内的值被修改
+            $this->update($data, ['id' => $data['id']], ['step', 'review_status', 'reviewer', 'remarks']);  //只允许第二个参数内的值被修改
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
-    
+
 
 
 

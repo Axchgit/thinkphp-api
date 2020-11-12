@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-10 20:11:40
+ * @LastEditTime: 2020-11-12 09:59:43
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -16,7 +16,6 @@ use think\Request;
 
 use app\model\Employee as EmployeeModel;
 use app\model\EmployeeLogin as EmpLoginModel;
-use app\model\JoinApply;
 use app\model\Performance as PerformanceModel;
 
 use app\model\Person as PersonModel;
@@ -34,7 +33,7 @@ class Admin extends Base
         $post =  request()->param();
         $person_model = new PersonModel();
         // return $this->create($post, '90', 204);
-        
+
         $res = $person_model->insertPerson($post);
         if ($res === true) {
             return $this->create('成功', '添加成功', 200);
@@ -173,8 +172,11 @@ class Admin extends Base
         if ($role === 4) {
             $faculty = $person_model->getInfoByNumber($number, 'faculty');
         }
+        if (!empty($post['faculty'])) {
+            $post['faculty'] = strlen($post['faculty']) > 1 ? (string)$post['faculty'] : '0' . (string)$post['faculty'];
+        }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $list = $person_model->getAllPerson($list_rows, '', ['query' => $post], $faculty, $post);
+        $list = $person_model->getAllPerson($list_rows, ['query' => $post], $faculty, $post);
         // if ($list) {
         return $this->create($list, '查询成功');
         // } else {
@@ -224,8 +226,11 @@ class Admin extends Base
         if ($role === 4) {
             $faculty = $person_model->getInfoByNumber($number, 'faculty');
         }
+        if (!empty($post['faculty'])) {
+            $post['faculty'] = strlen($post['faculty']) > 1 ? (string)$post['faculty'] : '0' . (string)$post['faculty'];
+        }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $list = $ja_model->getAllApply($list_rows, ['query' => $post], $faculty, $post,$role);
+        $list = $ja_model->getAllApply($list_rows, ['query' => $post], $faculty, $post, $role);
         return $this->create($list, '查询成功');
     }
 
@@ -323,7 +328,7 @@ class Admin extends Base
             $faculty = $person_model->getInfoByNumber($number, 'faculty');
         }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post,$role );
+        $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post, $role);
         return $this->create($list, '查询成功');
     }
 

@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-10 00:10:00
+ * @LastEditTime: 2020-11-12 12:11:15
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -44,6 +44,13 @@ Route::group('login', function () {
 })->completeMatch()->prefix('Login/');
 /****员工*****/
 // Route::resource('employee','Employee');
+/*******人员 */
+Route::group('index', function () {
+    Route::get('getProfile', 'getProfile')->middleware('checkrequest', 9)->allowCrossDomain();
+
+    // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
+})->completeMatch()->prefix('Index/');
+
 /*******管理员 */
 Route::group('admin', function () {
     

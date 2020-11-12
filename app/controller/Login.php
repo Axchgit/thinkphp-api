@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-11-10 00:04:03
+ * @LastEditTime: 2020-11-12 12:05:08
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Login.php
@@ -207,6 +207,8 @@ class Login extends Base
         // $emp_info = $emp_model->getAcInfo($res['data']->uuid);
         $person_info = $person_model->where('number', $res['data']->uuid)->find();
         $person_info['id_photo'] = Db::table('person_account')->where('number', $res['data']->uuid)->value('id_photo');
+        $person_info['profile'] = Db::table('person_account')->where('number', $res['data']->uuid)->value('profile');
+
         return $this->create($person_info);
     }
 
