@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Index.php
- * @LastEditTime: 2020-11-12 11:56:28
+ * @LastEditTime: 2020-11-15 00:59:50
  * @LastEditors: 罗曼
  */
 namespace app\controller;
@@ -38,6 +38,8 @@ class Index extends Base
 
 
     }
+
+    
 
 
 

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-11-10 20:54:36
+ * @LastEditTime: 2020-11-15 01:58:48
  * @LastEditors: 罗曼
  */
 
@@ -61,7 +61,7 @@ class JoinApply extends Model
         $material_model = new MaterialModel();
 
         //知识点:删除指定键名元素
-        $post_select = array_diff_key($post, ["list_rows" => 0, "page" => 0,'faculty'=>-1]);
+        $post_select = array_diff_key($post, ["list_rows" => 0, "page" => 0, 'faculty' => -1]);
         // return $post;
         // if ($faculty == '') {
         $data = $this->where($post_select)->paginate($list_rows, $isSimple, $config);
@@ -127,6 +127,37 @@ class JoinApply extends Model
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+
+
+
+
+
+    /*********首页charts数据*/
+
+    //查询所有申请人数
+    public function getPersonCount(string $faculty=null)
+    {
+        if($faculty===null){
+            return $this->group('number')->count();
+        }
+        return Db::view('person', 'number,faculty')
+            ->view('join_apply', 'number', 'person.number=join_apply.number')
+            ->where('faculty', $faculty)
+            ->count();
+    }
+    //查询审核数
+    public function getReviewCount(int $review_status = 2,string $faculty=null)
+    {
+        if($faculty===null){
+            return $this->where('review_status', $review_status)->count();
+        }
+        return Db::view('person', 'number,faculty')
+        ->view('join_apply', 'number', 'person.number=join_apply.number')
+        ->where('faculty', $faculty)
+        ->where('review_status', $review_status)
+        ->count();
     }
 
 

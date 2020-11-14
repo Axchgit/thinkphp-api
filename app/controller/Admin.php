@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-12 09:59:43
+ * @LastEditTime: 2020-11-15 02:03:22
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -329,6 +329,46 @@ class Admin extends Base
         }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
         $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post, $role);
+        return $this->create($list, '查询成功');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //首页charts数据
+    public function getCount(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
+        $person_model = new PersonModel();
+        $ja_model = new JoinApplyModel();
+        $faculty = $role <= 3 ? null : $person_model->getInfoByNumber($number, 'faculty');
+        $apply_person_count = $ja_model->getPersonCount($faculty);
+        $reviewing_count = $ja_model->getReviewCount(1, $faculty);
+        $reviewed_count = $ja_model->getReviewCount(2, $faculty);
+        $no_reviewed_count = $ja_model->getReviewCount(3, $faculty);
+
+        $list = [
+            'applyPersonCount' => $apply_person_count,
+            'reviewingCount' => $reviewing_count,
+            'reviewedCount' => $reviewed_count,
+            'noReviewedCount' => $no_reviewed_count,
+            // 'headerCounts'=>[$apply_person_count,$reviewing_count,$reviewed_count,$no_reviewed_count]
+        ];
         return $this->create($list, '查询成功');
     }
 

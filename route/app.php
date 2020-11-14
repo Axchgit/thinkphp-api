@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-12 12:11:15
+ * @LastEditTime: 2020-11-15 01:07:09
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -67,6 +67,9 @@ Route::group('admin', function () {
     Route::get('viewRecruit', 'viewRecruit')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('viewAllPersonAccount', 'viewAllPersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
+    //首页charts数据
+    Route::get('getCount', 'getCount')->middleware('checkrequest', 4)->allowCrossDomain();
+
 })->completeMatch()->prefix('Admin/');
 
 
