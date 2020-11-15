@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-11-03 15:36:43
+ * @LastEditTime: 2020-11-15 13:01:12
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Test.php
@@ -23,12 +23,17 @@ use app\model\Goods as GoodsModel;
 use app\model\GoodsTemp as GoodsTempModel;
 
 use app\model\RecruitPartyMember as RecruitPartyMemberModel;
+use app\model\JoinApply as JoinApplyModel;
 
 
 
 
 class Test extends Base
 {
+    public function ten(){
+        $ja_model= new JoinApplyModel();
+        return $ja_model->countLineCharts();
+    }
     
     public function night()
     {

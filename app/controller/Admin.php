@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-15 02:03:22
+ * @LastEditTime: 2020-11-16 02:09:06
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -357,10 +357,10 @@ class Admin extends Base
         $person_model = new PersonModel();
         $ja_model = new JoinApplyModel();
         $faculty = $role <= 3 ? null : $person_model->getInfoByNumber($number, 'faculty');
-        $apply_person_count = $ja_model->getPersonCount($faculty);
-        $reviewing_count = $ja_model->getReviewCount(1, $faculty);
-        $reviewed_count = $ja_model->getReviewCount(2, $faculty);
-        $no_reviewed_count = $ja_model->getReviewCount(3, $faculty);
+        $apply_person_count = $ja_model->countApplyPerson($faculty);
+        $reviewing_count = $ja_model->countReview(1, $faculty);
+        $reviewed_count = $ja_model->countReview(2, $faculty);
+        $no_reviewed_count = $ja_model->countReview(3, $faculty);
 
         $list = [
             'applyPersonCount' => $apply_person_count,
@@ -370,6 +370,35 @@ class Admin extends Base
             // 'headerCounts'=>[$apply_person_count,$reviewing_count,$reviewed_count,$no_reviewed_count]
         ];
         return $this->create($list, '查询成功');
+    }
+
+    //折线图
+    public function getLineCharts(Request $request){
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
+        $person_model = new PersonModel();
+        $ja_model = new JoinApplyModel();
+        $faculty = $role <= 3 ? null : $person_model->getInfoByNumber($number, 'faculty');
+        $list = $ja_model->countLineCharts($faculty);
+        return $this->create(['columns'=> ['年份','新增申请人数'],'rows'=>$list = array_reverse($list)], '查询成功');        
+    }
+
+    //性别统计
+    public function getCountPersonSex(Request $request){
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
+        $person_model = new PersonModel();
+        $ja_model = new JoinApplyModel();
+        $faculty = $role <= 3 ? null : $person_model->getInfoByNumber($number, 'faculty');
+
+        $result=$ja_model->countPersonSex($faculty);
+        return $this->create(['columns'=> ['性别','人数'],'rows'=>$result], '查询成功');
+
+        
     }
 
 
