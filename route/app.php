@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-16 01:09:06
+ * @LastEditTime: 2020-11-17 14:23:04
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -71,7 +71,13 @@ Route::group('admin', function () {
     Route::get('getCount', 'getCount')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getLineCharts', 'getLineCharts')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getCountPersonSex', 'getCountPersonSex')->middleware('checkrequest', 4)->allowCrossDomain();
-
+    Route::get('getCountPersonNation', 'getCountPersonNation')->middleware('checkrequest', 4)->allowCrossDomain();
+    //发展党员大数据
+    Route::get('getCountRecruitNation', 'getCountRecruitNation')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('getCountRecruitSex', 'getCountRecruitSex')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('getCountRecruitFaculty', 'getCountRecruitFaculty')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('getCountRecruitPost', 'getCountRecruitPost')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('getCountRecruitStage', 'getCountRecruitStage')->middleware('checkrequest', 4)->allowCrossDomain();
     
     
 })->completeMatch()->prefix('Admin/');

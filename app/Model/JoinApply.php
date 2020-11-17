@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-11-16 02:02:34
+ * @LastEditTime: 2020-11-16 21:49:41
  * @LastEditors: 罗曼
  */
 
@@ -137,81 +137,85 @@ class JoinApply extends Model
     /*********首页charts数据*/
 
     //查询所有申请人数
-    public function countApplyPerson(string $faculty = null)
+    public function countApplyPerson(string $faculty = '')
     {
-        if ($faculty === null) {
-            return $this->group('number')->count();
-        }
         return Db::view('person', 'number,faculty')
             ->view('join_apply', 'number', 'person.number=join_apply.number')
-            ->where('faculty', $faculty)
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
             ->count();
     }
     //查询审核数
-    public function countReview(int $review_status = 2, string $faculty = null)
+    public function countReview(int $review_status = 2, string $faculty = '')
     {
-        if ($faculty === null) {
-            return $this->where('review_status', $review_status)->count();
-        }
         return Db::view('person', 'faculty')
             ->view('join_apply', 'number', 'person.number=join_apply.number')
-            ->where('faculty', $faculty)
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
             ->where('review_status', $review_status)
             ->count();
     }
 
     //折线图数据
-    public function countLineCharts(string $faculty = null)
+    public function countLineCharts(string $faculty = '')
     {
         $year = (int)date('Y');
-        // return $year;
         $list = [];
         for ($i = $year; $i > $year - 10; $i--) {
-            if ($faculty !== null) {
-                $count = Db::view('person', 'faculty')
-                    ->view('join_apply', 'number', 'person.number=join_apply.number')
-                    ->where('step', 1)
-                    ->whereYear('join_apply.create_time', $year)
-                    ->where('faculty', $faculty)
-                    // ->group("date_format(join_apply.create_time,'%Y')")
-                    ->count();
-            }
             $count = Db::view('person', 'faculty')
                 ->view('join_apply', 'number', 'person.number=join_apply.number')
                 ->where('step', 1)
                 ->whereYear('join_apply.create_time', $i)
-                // ->where('faculty', $faculty)
+                ->whereRaw("faculty='$faculty' or '$faculty' =''")
                 // ->group("date_format(join_apply.create_time,'%Y')")
                 ->count();
             $list[$year - $i]['年份'] = (string)$i;
             $list[$year - $i]['新增申请人数'] = $count;
-            // $list[$i] = $count;
         }
         return $list;
     }
+
     //男女占比
-    public function countPersonSex(string $faculty = null)
+    public function countPersonSex(string $faculty = '')
     {
         $list = [];
-        for ($i = 1; $i <= 2; $i++) {
-            if ($faculty !== null) {
-                $count = Db::view('person', 'sex')
-                    ->view('join_apply', 'number', 'person.number=join_apply.number')
-                    ->where('faculty', $faculty)
-
-                    ->where('step', 1)
-                    ->where('sex', $i)
-                    ->count();
-            }
-            $count = Db::view('person', 'sex')
-                ->view('join_apply', 'number', 'person.number=join_apply.number')
-                ->where('step', 1)
-                ->where('sex', $i)
-                ->count();
-            $list[$i - 1]['性别'] = $i==1?'男':'女';
-            $list[$i - 1]['人数'] = $count;
+        $count = Db::view('person', 'id')
+            ->view('join_apply', 'number', 'person.number=join_apply.number')
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
+            ->where('step', 1)
+            ->fieldRaw('SUM(CASE WHEN sex = 1 THEN 1 ELSE 0 END) AS 男')
+            ->fieldRaw('SUM(CASE WHEN sex = 2 THEN 1 ELSE 0 END) AS 女')
+            ->find();
+        $count = array_diff_key($count, ["id" => -1, "number" => -1]);
+        $i = 0;
+        foreach ($count as $k => $v) {
+            $list[$i]['性别'] = $k;
+            $list[$i]['人数'] = $v;
+            $i++;
         }
+        // $count = Db::table('person')
+        //     ->alias('a')
+        //     ->join('join_apply b', 'a.number = b.number')
+        //     ->where('step', 1)
+        //     ->field('a.sex as 性别')
+        //     ->fieldRaw('count(*) AS 人数')
+        //     ->group('sex')
+        //     ->select();
         return $list;
+    }
+
+    public function countPersonNation(string $faculty = '')
+    {
+        $count = Db::table('person')
+            ->alias('a')
+            ->join('join_apply b', 'a.number = b.number')
+            //知识点:查询条件为空时,忽略该条件
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
+            ->where('step', 1)
+            // ->fetchSql(true)
+            ->field('a.nation as 民族')
+            ->fieldRaw('count(*) AS 人数')
+            ->group('nation')
+            ->select();
+        return $count;
     }
 
 
