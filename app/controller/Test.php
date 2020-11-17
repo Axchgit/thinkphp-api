@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-11-15 13:01:12
+ * @LastEditTime: 2020-11-18 00:01:18
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Test.php
@@ -52,28 +52,6 @@ class Test extends Base
         return $data[0];
     }
 
-    public function eight()
-    {
-
-        $goods_model = new GoodsModel();
-        // return '132';
-        return $goods_model->incrementalUpdata();
-    }
-    public function seven()
-    {
-
-        $post =  request()->param();
-        $gt_model = new GoodsTempModel();
-        $data = $gt_model->insertGoods($post);
-        if ($data) {
-            return $this->create('', '成功', 200);
-        } else {
-            return $this->create('', '失败', 204);
-        }
-        // $admin_model = new AdminModel();
-        // $data = $admin_model->saveLogcode('呵粑粑牛',12321);
-
-    }
 
     public function testOne()
     {

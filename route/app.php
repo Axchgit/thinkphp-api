@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-17 14:23:04
+ * @LastEditTime: 2020-11-18 00:03:06
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -96,36 +96,5 @@ Route::group('person', function () {
 
 
 
-
-Route::group('employee', function () {
-    //获取员工所有信息
-    Route::get('selectall', 'selectAll')->middleware('checkrequest', 1)->allowCrossDomain();
-    //根据工号/姓名获取信息,工号为8位数字
-    Route::get('selectByInfo', 'selectByInfo')->middleware('checkrequest', 1)->allowCrossDomain();
-    //根据权限获取信息
-    Route::get('selectByRole', 'selectByRole')->middleware('checkrequest', 1)->allowCrossDomain();
-    Route::get('selectAcAll', 'selectAcAll')->middleware('checkrequest', 1)->allowCrossDomain();
-    Route::post('sendRecoverCode', 'sendRecoverCode')->allowCrossDomain();
-    Route::post('sendActivateCode', 'sendActivateCode')->allowCrossDomain();
-    Route::post('checkRecover', 'checkRecover')->allowCrossDomain();
-    Route::post('updateAcPW', 'updateAcPW')->allowCrossDomain();
-    Route::post('createEmpAc', 'createEmpAc')->allowCrossDomain();
-
-    /***********员工业绩******/
-    Route::post('submitPerformanc', 'submitPerformanc')->middleware('checkrequest', 5)->allowCrossDomain();
-    Route::get('selectPerformanceByUuid', 'selectPerformanceByUuid')->middleware('checkrequest', 5)->allowCrossDomain();
-    Route::get('selectPerformanceGoodsByUuid', 'selectPerformanceGoodsByUuid')->middleware('checkrequest', 5)->allowCrossDomain();
-    Route::post('deletePerformanceByUuuid', 'deletePerformanceByUuuid')->middleware('checkrequest', 5)->allowCrossDomain();
-})->completeMatch()->prefix('Employee/');
-
-
-/**
- * 商品信息
- */
-
-Route::group('goods', function () {
-    Route::post('uploadExcel', 'uploadExcel')->middleware('checkrequest', 1)->allowCrossDomain();
-    Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
-})->completeMatch()->prefix('Goods/');
 
 
