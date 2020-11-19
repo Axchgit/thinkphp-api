@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-11-17 14:50:17
+ * @LastEditTime: 2020-11-20 01:43:51
  * @LastEditors: 罗曼
  */
 
@@ -44,70 +44,6 @@ class RecruitPartyMember extends Model
             return $e->getMessage();
         }
     }
-    //获取人员信息,分页显示 
-    // public function getRecruitOld($list_rows, $config, $faculty, $post, $role, $isSimple = false)
-    // {
-    //     //删除指定键名元素
-    //     $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
-    //     $person_model = new PersonModel();
-    //     //获取json数据
-    //     $fileName = config('app.json_path') . '/options.json';
-    //     $string = file_get_contents($fileName);
-    //     $json_data = json_decode($string, true);
-    //     //获取当前时间
-    //     $now = date("Y-m-d H:i:s");
-    //     $data = $this
-    //         ->where('stage_time', '<', $now)
-    //         ->where($post)
-    //         ->distinct(true)
-    //         ->group('number')
-    //         ->paginate($list_rows, $isSimple, $config);
-    //     foreach ($data as $k => $v) {
-    //         $person_info = $person_model->getAllInfoByNumber($v['number']);  //获取人员信息
-    //         //二级管理员查看时剔除非本学院人员信息
-    //         if ($role == 4 && $faculty !== $person_info['faculty']) {
-    //             unset($data[$k]);
-    //             continue;
-    //         }
-    //         /************个人信息*/
-    //         $data[$k]['name'] = $person_info['name'];
-    //         $data[$k]['sex'] = $person_info['sex'];
-    //         $data[$k]['post'] = $person_info['post'];
-    //         $data[$k]['nation'] = $person_info['nation'];
-    //         $data[$k]['native_place'] = $person_info['native_place'];
-    //         $data[$k]['id_card'] = $person_info['id_card'];
-    //         $data[$k]['phone_number'] = $person_info['phone_number'];
-    //         $data[$k]['politival_status'] = $person_info['political_status'];
-    //         $data[$k]['faculty'] = (int)($person_info['faculty']);
-    //         // $data[$k]['post'] = (int)($person_info['faculty']);
-
-    //         $data[$k]['remarkes'] = (int)($person_info['faculty']);
-
-
-    //         //学院
-    //         $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
-    //         $found_key = array_search($person_info['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
-    //         // $data[$k]['faculty'] = $json_data[$found_key]['label'];
-    //         //党支部
-    //         $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
-    //         $found_child_key = array_search($person_info['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标
-    //         $data[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
-    //         /************发展党员信息*/
-    //         for ($i = 0; $i <= 8; $i++) {
-    //             $recruit_info[$i] = $this->where('number', $v['number'])->where('stage', $i + 1)->where('stage_time', '<', $now)->find();
-    //             $data[$k]['stage' . $i] = substr($recruit_info[$i]['stage_time'], 0, 10);
-    //             if (!empty($recruit_info[$i]['contacts'])) {
-    //                 $data[$k]['contacts_is'] = $recruit_info[$i]['contacts'];
-    //             }
-    //             if (!empty($recruit_info[$i]['introducer'])) {
-    //                 $data[$k]['introducer_is'] = $recruit_info[$i]['introducer'];
-    //             }
-    //         }
-    //         $data[$k]['contacts'] = !empty($data[$k]['contacts_is']) ? $data[$k]['contacts_is'] : '';
-    //         $data[$k]['introducer'] = !empty($data[$k]['introducer_is']) ? $data[$k]['introducer_is'] : '';
-    //     }
-    //     return $data;
-    // }
 
     //发展党员信息
     public function getRecruit($list_rows, $config, $faculty, $post, $role, $isSimple = false)
@@ -133,7 +69,7 @@ class RecruitPartyMember extends Model
         // return $select_post;
         $list =  Db::view('person')
             ->view('recruit_party_member', 'stage', 'person.number=recruit_party_member.number')
-            ->fieldRaw('max(case when stage=1 then  DATE_FORMAT(stage_time,"%Y-%m-%d") else "" end) as stage0')
+            ->fieldRaw('max(case when stage=1 then DATE_FORMAT(stage_time,"%Y-%m-%d") else "" end) as stage0')
             ->fieldRaw('max(case when stage=2 then DATE_FORMAT(stage_time,"%Y-%m-%d") else "" end) as stage1')
             ->fieldRaw('max(case when stage=3 then DATE_FORMAT(stage_time,"%Y-%m-%d") else "" end) as stage2')
             ->fieldRaw('max(case when stage=4 then DATE_FORMAT(stage_time,"%Y-%m-%d") else "" end) as stage3')
@@ -253,7 +189,16 @@ class RecruitPartyMember extends Model
             ->fieldRaw('count(*) AS 人数')
             ->group('faculty')
             ->select();
-        return $count;
+
+        $faculty_map =   ['文学与传媒学院', '马克思主义学院', '外国语学院', '数学与统计学院', '物理与机电工程学院', '化学与生物工程学院', '计算机与信息工程学院', '体育学院', '教师教育学院', '音乐舞蹈学院', '经济与管理学院', '历史与社会学院', '美术与设计学院'];
+        $list=[];
+        foreach($count as $k=>$v){
+            $list[$k]['学院'] = $faculty_map[(int)$count[$k]['学院']-1];
+            $list[$k]['人数'] = $count[$k]['人数'];
+
+        }
+        
+        return $list;
     }
 
     //统计职务信息
