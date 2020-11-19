@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-11-16 21:49:41
+ * @LastEditTime: 2020-11-19 22:51:34
  * @LastEditors: 罗曼
  */
 
@@ -60,62 +60,46 @@ class JoinApply extends Model
         $person_model = new PersonModel();
         $material_model = new MaterialModel();
 
-        //知识点:删除指定键名元素
-        $post_select = array_diff_key($post, ["list_rows" => 0, "page" => 0, 'faculty' => -1]);
-        // return $post;
-        // if ($faculty == '') {
-        $data = $this->where($post_select)->paginate($list_rows, $isSimple, $config);
-        // } else {
-        //     $data = $this->where($post)->where('faculty', $faculty)->paginate($list_rows, $isSimple = false, $config);
-        // }
-        //判断是否有值
-        // if ($data->isEmpty()) {
-        //     return $data;
-        // } else {
-        $fileName = config('app.json_path') . '/options.json';
-        $string = file_get_contents($fileName);
-        $json_data = json_decode($string, true);
-        // $material = [];
-        foreach ($data as $k => $v) {
-            $person_info = $person_model->getAllInfoByNumber($data[$k]['number']);  //获取人员信息
-            for ($i = 0; $i <= 3; $i++) {
-                $material_path_info[$i] = $material_model->getInfoByNumber($data[$k]['number'], 'category', $i + 1); //获取审核资料
-            }
-            //二级管理员查看时剔除非本学院人员信息
-            if (($role == 4 && $faculty !== $person_info['faculty']) || (!empty($post['faculty']) && $post['faculty'] !== $person_info['faculty'])) {
-                unset($data[$k]);
-                continue;
-            }
-            /************个人信息*/
-            $data[$k]['name'] = $person_info['name'];
-            $data[$k]['sex'] = $person_info['sex'];
-            $data[$k]['post'] = $person_info['post'];
-            $data[$k]['nation'] = $person_info['nation'];
-            $data[$k]['email'] = $person_info['email'];
-            $data[$k]['role'] = $person_info['role'];
-            $data[$k]['faculty'] = (int)($person_info['faculty']);
-
-
-            //学院
-            $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
-            $found_key = array_search($person_info['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
-            // $data[$k]['faculty'] = $json_data[$found_key]['label'];
-            //党支部
-            $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
-            $found_child_key = array_search($person_info['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标
-            $data[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
-
-            /************审核资料*/
-            $data[$k]['certificate_one'] = !empty($material_path_info[0]['score']) ? $material_path_info[3]['score'] : '未认证';
-            $data[$k]['certificate_two'] = !empty($material_path_info[1]['score']) ? $material_path_info[1]['score'] : '未认证';
-            $data[$k]['certificate_three'] = !empty($material_path_info[2]['score']) ? $material_path_info[2]['score'] : '未认证';
-            $data[$k]['applicationPath'] = !empty($material_path_info[3]['remarks']) ? $material_path_info[3]['remarks'] : '';
+        //删除指定键名元素
+        $select_post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+        if ($role == 3) {
+            $faculty = '';
         }
-        // $data['material'] = $material;
-        //重新建立索引
-        // $data=array_values($data);
-        return $data;
-        // }
+        $select_post_new = [];
+        foreach ($select_post as $k => $v) {
+            $select_post_new['person.' . $k] = $v;
+            if ($k == 'step' || $k == 'review_status') {
+                unset($select_post_new['person.' . $k]);
+                $select_post_new['join_apply.' . $k] = $v;
+            }
+        }
+        $list =  Db::view('person')
+            ->view('join_apply', 'step,review_status,reviewer,remarks,create_time', 'person.number=join_apply.number')
+            ->view('material', 'score as del', 'person.number=material.number', 'LEFT')
+
+            ->fieldRaw('max(case when category=1 then score else "未认证" end) as certificate_one')
+            ->fieldRaw('max(case when category=2 then score else "未认证" end) as certificate_two')
+            ->fieldRaw('max(case when category=3 then score else "未认证" end) as certificate_three')
+            ->fieldRaw('max(case when category=4 then material.remarks else "" end) as applicationPath')
+            // ->fieldRaw('max(stage) as stage')
+            ->where($select_post_new)
+            // ->where('stage_time', '<', $now)
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
+            ->group('person.number')
+            ->paginate($list_rows, $isSimple, $config)
+            ->each(function ($item, $key) {
+                $item['faculty'] = (int)$item['faculty'];
+                // $person_model->getJsonData();
+                return $item;
+            })->toArray();
+        foreach ($list['data'] as $k => $v) {
+            if ($v['party_branch'] == 0) {
+                $list['data'][$k]['party_branch'] = '未选择';
+            } else {
+                $list['data'][$k]['party_branch'] = $person_model->getJsonData('options.json', $v['faculty'], $v['party_branch'], true);
+            }
+        }
+        return  $list;
     }
 
     //修改/审核申请
