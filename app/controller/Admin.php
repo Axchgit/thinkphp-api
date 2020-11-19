@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-18 00:01:36
+ * @LastEditTime: 2020-11-19 23:53:04
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -25,6 +25,8 @@ use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 
 
 use think\facade\Db;
+
+use function PHPSTORM_META\type;
 
 class Admin extends Base
 {
@@ -231,6 +233,13 @@ class Admin extends Base
         }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
         $list = $ja_model->getAllApply($list_rows, ['query' => $post], $faculty, $post, $role);
+        // $data = json($list);
+        // return gettype($list);
+
+        // foreach($list as $k=>$v){
+        //         $list[$k]['party_branch'] = $person_model->getJsonData('options.json',$v['party_branch'],true);
+
+        // }
         return $this->create($list, '查询成功');
     }
 
@@ -238,12 +247,17 @@ class Admin extends Base
     public function reviewApply(Request $request)
     {
         $tooken_res = $request->data;
+        $role = $tooken_res['data']->role;
+        $is_high_admin = $role < 4;
         $number = $tooken_res['data']->uuid;
         $post = request()->param();
         // $person_model = new PersonModel();
         $ja_model = new JoinApplyModel();
         $rpm_model = new RecruitPartyMemberModel();
+        
+        // $post['introducer'] = $ja_model->getApplyById($post['id'],'remarks');
 
+        $introducer = $ja_model->getApplyById($post['id'],'remarks');
 
         $post['reviewer'] = $number;
         $post['remarks'] = '';
@@ -271,10 +285,25 @@ class Admin extends Base
                 }
                 break;
             case 3:
-                $post['stage'] = 5;
-                $rpm_res = $rpm_model->createRecruit($post);
-                break;
+                if (!$is_high_admin && $post['review_status'] == 2) {
+                    $post['review_status'] = 4;
+                    $post['remarks'] = $post['introducer'];
+                    $ja_res = $ja_model->updateJoinApply($post);
+                    // $rpm_res=true;
+                    // break;
+                } 
+                // else if ($post['review_status'] == 2) {
+                    $post['stage'] = 5;
+                    $post['introducer'] = $introducer;
+                    $rpm_res = $rpm_model->createRecruit($post);
+                    break;
+                // }
+
             case 4:
+                if (!$is_high_admin && $post['review_status'] == 2) {
+                    $post['review_status'] = 4;
+                    $ja_res = $ja_model->updateJoinApply($post);
+                }
                 $post['stage'] = 6;
                 $rpm_res = $rpm_model->createRecruit($post);
                 if ($rpm_res === true) {
@@ -284,6 +313,10 @@ class Admin extends Base
                 }
                 break;
             case 5:
+                if (!$is_high_admin && $post['review_status'] == 2) {
+                    $post['review_status'] = 4;
+                    $ja_res = $ja_model->updateJoinApply($post);
+                }
                 $post['stage'] = 8;
                 $rpm_res = $rpm_model->createRecruit($post);
                 if ($rpm_res === true) {
@@ -484,20 +517,20 @@ class Admin extends Base
         return $this->create(['columns' => ['职务', '人数'], 'rows' => $result], '查询成功');
     }
 
-        //发展阶段统计
-        public function getCountRecruitStage(Request $request)
-        {
-            $tooken_res = $request->data;
-            $number = $tooken_res['data']->uuid;
-            $role = $tooken_res['data']->role;
-    
-            $person_model = new PersonModel();
-            $rpm_model = new RecruitPartyMemberModel();
-            $faculty = $role <= 3 ? '' : $person_model->getInfoByNumber($number, 'faculty');
-    
-            $result = $rpm_model->countRecruitStage($faculty);
-            return $this->create(['columns' => ['发展阶段', '人数'], 'rows' => $result], '查询成功');
-        }
+    //发展阶段统计
+    public function getCountRecruitStage(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
+        $person_model = new PersonModel();
+        $rpm_model = new RecruitPartyMemberModel();
+        $faculty = $role <= 3 ? '' : $person_model->getInfoByNumber($number, 'faculty');
+
+        $result = $rpm_model->countRecruitStage($faculty);
+        return $this->create(['columns' => ['发展阶段', '人数'], 'rows' => $result], '查询成功');
+    }
 
 
 

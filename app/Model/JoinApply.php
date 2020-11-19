@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-11-19 22:51:34
+ * @LastEditTime: 2020-11-19 23:44:44
  * @LastEditors: 罗曼
  */
 
@@ -50,8 +50,11 @@ class JoinApply extends Model
         // } catch (\Exception $e) {
         //     return  $e->getMessage();
         // }
+    }
 
-
+    public function getApplyById($id,$value){
+        return $this->where('id',$id)->value($value);
+        
     }
 
     //获取人员信息,分页显示 
@@ -74,7 +77,7 @@ class JoinApply extends Model
             }
         }
         $list =  Db::view('person')
-            ->view('join_apply', 'step,review_status,reviewer,remarks,create_time', 'person.number=join_apply.number')
+            ->view('join_apply', 'id,step,review_status,reviewer,remarks,create_time', 'person.number=join_apply.number')
             ->view('material', 'score as del', 'person.number=material.number', 'LEFT')
 
             ->fieldRaw('max(case when category=1 then score else "未认证" end) as certificate_one')

@@ -2,10 +2,10 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-08-21 15:06:11
- * @LastEditors: xch
+ * @LastEditTime: 2020-11-19 12:25:02
+ * @LastEditors: 罗曼
  * @Description: 
- * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\Model\Admin.php
+ * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Admin.php
  */
 
 namespace app\model;
@@ -33,7 +33,7 @@ class Admin extends Model
      */
     public function saveLogcode($name, $log_code)
     {
-        $admin_uuid = $this->where('admin_name',$name)->value('uuid');        
+        $admin_uuid = $this->where('admin_name', $name)->value('uuid');
         $data = [
             'uuid' => $admin_uuid,
             'code' => $log_code,
@@ -43,7 +43,7 @@ class Admin extends Model
         return Db::table('temp_code')->insert($data);
         // $admin->code = $log_code;
     }
-        /**
+    /**
      * @description: 删除此用户之前的登录码
      * @param {type} 
      * @return {type} 
@@ -51,7 +51,7 @@ class Admin extends Model
     public function deleteLogcode($name)
     {
 
-        $admin_uuid = $this->where('admin_name',$name)->value('uuid');
+        $admin_uuid = $this->where('admin_name', $name)->value('uuid');
         // $res = Db::table('temp_code')->where('uuid',$admin_uuid)->selectOrFail();
         // if($res){
         //     return Db::table('temp_code')->where('uuid',$admin_uuid)->delete();;
@@ -59,7 +59,7 @@ class Admin extends Model
         //     return true;
         // }        
         // 知识点:跨表数据库操作
-        return Db::table('temp_code')->where('uuid',$admin_uuid)->delete();
+        return Db::table('temp_code')->where('uuid', $admin_uuid)->delete();
         // $admin->code = $log_code;
     }
 
@@ -73,4 +73,10 @@ class Admin extends Model
 
         return $this->where('admin_name', $name)->value('admin_email');
     }
+
+
+
+
+
+    //over
 }

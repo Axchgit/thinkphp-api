@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Index.php
- * @LastEditTime: 2020-11-15 00:59:50
+ * @LastEditTime: 2020-11-19 21:15:30
  * @LastEditors: 罗曼
  */
 namespace app\controller;
@@ -37,6 +37,13 @@ class Index extends Base
         return $this->create(['login_record'=>$login_record], '查询成功');
 
 
+    }
+
+    public function getDict(){
+        $person_model = new PersonModel();
+        return [0=>1];
+        return $person_model->getDictFromJson();
+        
     }
 
     

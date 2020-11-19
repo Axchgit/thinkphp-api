@@ -107,7 +107,7 @@ function signToken($number, $role)
     "aud" => '',          //面象的用户，可以为空
     "iat" => time(),      //签发时间
     "nbf" => time(),    //在什么时候jwt开始生效  （这里表示生成100秒后才生效）
-    "exp" => time() + 25920000, //token 过期时间
+    "exp" => time() + 259200000, //token 过期时间
     "data" => [           //记录的userid的信息，这里是自已添加上去的，如果有其它信息，可以再添加数组的键值对
       'uuid' => $number,
       'role' => $role,
