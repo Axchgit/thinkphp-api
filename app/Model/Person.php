@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-11-10 20:38:00
+ * @LastEditTime: 2020-11-19 22:21:23
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -127,7 +127,7 @@ class Person extends Model
     public function updatePerson($data)
     {
         try {
-            $data = request()->only(['id','role']);
+            $data = request()->only(['id', 'role']);
             $this->update($data);
             return true;
         } catch (\Exception $e) {
@@ -227,78 +227,48 @@ class Person extends Model
         // }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-    //TODO:删除
-    /************************************ */
-
-    //获取员工信息,分页显示
-    public function getEmpInfo($list_rows, $isSimple = false, $config)
+    public function getJson()
     {
-        $data = $this->paginate($list_rows, $isSimple = false, $config);
-        //判断是否有值
-        if ($data->isEmpty()) {
-            return false;
-        } else {
-            return $data;
+        $fileName = config('app.json_path') . '/options.json';
+        $string = file_get_contents($fileName);
+        $json_data = json_decode($string, true);
+        return $json_data;
+    }
+
+
+
+
+
+
+
+    /**
+     * @description: 从json文件中查找label
+     * @param : 
+     * @param mixed $json_file_name  json文件名(默认地址在config文件设置)
+     * @param mixed $select_key       要查询数据的value
+     * @param bool $is_child          要查询的数组是否在子节点
+     * @return {*}
+     */
+    public function getJsonData($json_file_name, $select_faculty, string $select_branch = '', bool $is_child = false)
+    {
+        $fileName = config('app.json_path') . '/' . $json_file_name;
+        $string = file_get_contents($fileName);
+        $json_data = json_decode($string, true);
+
+        $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
+        $found_key = array_search($select_faculty, $found_arr); //所查询数据在josn_data数组中的下标
+        $res = $json_data[$found_key]['label'];
+        if ($is_child) {
+            $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
+            $found_child_key = array_search($select_branch, $found_child_arr); //所查询数据在josn_data数组中的下标
+            $res = $json_data[$found_key]['children'][$found_child_key]['label'];
         }
+        return $res;
     }
-    //通过uuid查询
-    public function getInfoByUuid($emp_uuid, $value)
-    {
-        return $this->where('uuid', $emp_uuid)->value($value);
-    }
-    //通过工号查询
-    public function getInfoByWorkNum($work_num, $value)
-    {
-        return $this->where('work_num', $work_num)->value($value);
-    }
-    //通过工号/姓名查询
-    public function getEmpByWrokNum($work_num, $real_name)
-    {
-        if (empty($work_num)) {
-            $data = $this->where('real_name', $real_name)->select();
-        } else if (empty($real_name)) {
-            $data = $this->where('work_num', $work_num)->select();
-        } else {
-            $data = $this->where('work_num', $work_num)->where('real_name', $real_name)->find();
-        }
-        if (empty($data)) {
-            return false;
-        } else {
-            return $data;
-        }
-    }
-    //通过姓名查询
-    // public function findEmpAc($work_num,$email)
-    // {
 
-    //     //姓名可能会有重复,使用select查询
-    //     $data = $this->where('real_name', $real_name)->select();
-    //     if ($data->isEmpty()) {
-    //         return false;
-    //     } else {
-    //         return $data;
-    //     }
-    // }
-    //通过权限查询,多个数据,用到分页
-    public function getEmpByRole($list_rows, $isSimple = false, $config, $role)
-    {
-        $data = $this->where('role', $role)->paginate($list_rows, $isSimple = false, $config);
-        if ($data->isEmpty()) {
-            return false;
-        } else {
-            return $data;
-        }
-    }
+
+
+
+
+    // over
 }
