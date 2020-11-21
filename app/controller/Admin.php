@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-19 23:53:04
+ * @LastEditTime: 2020-11-22 02:50:30
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -22,6 +22,8 @@ use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
 use app\model\JoinApply as JoinApplyModel;
 use app\model\RecruitPartyMember as RecruitPartyMemberModel;
+use app\model\Transfer as TransferModel;
+use app\model\Material as MaterialModel;
 
 
 use think\facade\Db;
@@ -43,10 +45,23 @@ class Admin extends Base
             return $this->create('', $res, 200);
         }
     }
+
+    public function importMaterialExcel(){
+        $post =  request()->param();
+        $material_model = new MaterialModel();
+        // return $this->create($post, '90', 204);
+        $res = $material_model->insertMaterial($post);
+        if ($res === true) {
+            return $this->create('成功', '添加成功', 200);
+        } else {
+            return $this->create('', $res, 200);
+        }
+    }
     /***********人员信息 */
     //查询人员信息
     public function selectPerson()
     {
+
         $post =  request()->param();
         // $res = $request->data;
         $person_model = new PersonModel();
@@ -254,10 +269,10 @@ class Admin extends Base
         // $person_model = new PersonModel();
         $ja_model = new JoinApplyModel();
         $rpm_model = new RecruitPartyMemberModel();
-        
+
         // $post['introducer'] = $ja_model->getApplyById($post['id'],'remarks');
 
-        $introducer = $ja_model->getApplyById($post['id'],'remarks');
+        $introducer = $ja_model->getApplyById($post['id'], 'remarks');
 
         $post['reviewer'] = $number;
         $post['remarks'] = '';
@@ -291,12 +306,12 @@ class Admin extends Base
                     $ja_res = $ja_model->updateJoinApply($post);
                     // $rpm_res=true;
                     // break;
-                } 
+                }
                 // else if ($post['review_status'] == 2) {
-                    $post['stage'] = 5;
-                    $post['introducer'] = $introducer;
-                    $rpm_res = $rpm_model->createRecruit($post);
-                    break;
+                $post['stage'] = 5;
+                $post['introducer'] = $introducer;
+                $rpm_res = $rpm_model->createRecruit($post);
+                break;
                 // }
 
             case 4:
@@ -363,6 +378,81 @@ class Admin extends Base
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
         $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post, $role);
         return $this->create($list, '查询成功');
+    }
+
+    //获取组织关系转接申请信息
+    public function viewTransferApply(Request $request)
+    {
+        $post = request()->param();
+
+        // return json($post);
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $transfer_model = new TransferModel();
+
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        if ($role === 3) {
+            $post_string = 'review_steps >= 3';
+        } else if ($role === 4) {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
+            $post_string = 'faculty = ' . $faculty . ' or(receive_faculty = ' . $faculty . ' and review_steps>=2)';
+        }
+        $list = $transfer_model->getAllApply($list_rows, ['query' => $post], $post, $post_string, $role);
+        return $list;
+    }
+
+    public function reviewTransferApply(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $transfer_model = new TransferModel();
+        switch ($post['review_steps']) {
+            case '1':
+                $post['out_low_reviewer'] = $number;
+                break;
+            case '2':
+                $post['in_low_reviewer'] = $number;
+                break;
+            case '3':
+                $post['high_reviewer'] = $number;
+                if ($post['review_status'] === 2) {
+                    $post['review_steps'] = $post['review_steps'] + 1;
+                    $person_update_data = [
+                        'faculty' => $post['receive_faculty'],
+                        'party_branch' => $post['receive_organization'],
+                        'major' => $post['receive_major']
+                    ];
+                    $update_person_res = $person_model->updatePerson($person_update_data);
+                    $update_transfer_res = $transfer_model->updateTransfer($post);
+                    if ($update_transfer_res && $update_person_res) {
+                        return $this->create('', '组织关系转接成功,已更改发起人组织信息');
+                    } else {
+                        return $this->create([$update_transfer_res, $update_person_res], '失败');
+                    }
+                }
+                break;
+            default:
+                # code...
+                break;
+        }
+        if ($post['review_status'] === 2) {
+            $post['review_steps'] = $post['review_steps'] + 1;
+            $post['review_status'] = 1;
+        }
+
+        // return [$post,$transfer_model->updateTransfer($post)];
+        $update_transfer_res = $transfer_model->updateTransfer($post);
+
+        if ($update_transfer_res) {
+            return $this->create('', '审核成功');
+        } else {
+            return $this->create($update_transfer_res, '审核失败');
+        }
     }
 
 

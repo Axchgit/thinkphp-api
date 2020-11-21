@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-11-19 23:44:44
+ * @LastEditTime: 2020-11-21 18:55:07
  * @LastEditors: 罗曼
  */
 
@@ -65,9 +65,6 @@ class JoinApply extends Model
 
         //删除指定键名元素
         $select_post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
-        if ($role == 3) {
-            $faculty = '';
-        }
         $select_post_new = [];
         foreach ($select_post as $k => $v) {
             $select_post_new['person.' . $k] = $v;

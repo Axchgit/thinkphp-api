@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-11-20 01:43:51
+ * @LastEditTime: 2020-11-22 02:35:56
  * @LastEditors: 罗曼
  */
 
@@ -27,6 +27,7 @@ class RecruitPartyMember extends Model
     //添加发展党员信息
     public function createRecruit($data)
     {
+
         try {
             $this->create($data, ['number', 'stage', 'stage_time', 'contacts', 'introducer', 'remarks']);  //只允许第二个参数内的值被修改
             return true;

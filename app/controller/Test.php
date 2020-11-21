@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-11-18 00:01:18
+ * @LastEditTime: 2020-11-22 02:37:01
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Test.php
@@ -57,7 +57,7 @@ class Test extends Base
     {
         // $admin_model = new AdminModel();
         // $data = $admin_model->saveLogcode('呵粑粑牛',12321);
-        return json(true);
+        return date("Y");
     }
     public function testTwo()
     {

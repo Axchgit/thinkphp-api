@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-18 00:02:00
+ * @LastEditTime: 2020-11-22 02:35:46
  * @LastEditors: 罗曼
  */
 
@@ -20,18 +20,46 @@ use app\model\PersonAccount as PersonAccountModel;
 use app\model\Material as MaterialModel;
 use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 use app\model\JoinApply as JoinApplyModel;
+use app\model\Transfer as TransferModel;
 
 
-
-use app\model\Employee as EmployeeModel;
-use app\model\EmployeeLogin as EmpLoginModel;
-use app\model\Performance as PerformanceModel;
 
 
 use think\facade\Db;
 
 class Person extends Base
 {
+
+    public function getProfile(Request $request)
+    {
+        //获取token中的学号
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+
+        $person_model = new PersonModel();
+        $data = $person_model->getAllInfoByNumber($number);
+        if (!empty($data)) {
+            $list['转出人姓名'] = $data['name'];
+            $list['转出人身份证号码'] = $data['id_card'];
+            $list['转出人手机号'] = $data['phone_number'];            
+            $list['转出人学院'] = $person_model->getJsonData('options.json', $data['faculty']);
+            $list['转出人专业'] = $data['major'];
+            $list['转出人班级'] = $data['class'];
+            $list['转出人性别'] = $data['sex'] = 1?'男':'女';
+            if ($data['party_branch'] == 0) {
+                $list['转出团支部'] = '未选择';
+            } else {
+                $list['转出党支部'] = $person_model->getJsonData('options.json', $data['faculty'], $data['party_branch'], true);
+            }
+            $list['转出人职务'] = $data['post'];
+            $list['转出人学历'] = $data['education'];
+            $list['转出人党支部管理员'] =$person_model->getInfoBySelectPost(['role'=>4],['faculty'=>$data['faculty']])['name'];
+            $list['管理员联系方式'] =$person_model->getInfoBySelectPost(['role'=>4],['faculty'=>$data['faculty']])['phone_number'];
+            return $this->create($list, '获取成功', 200);
+        }
+
+        return $this->create('', '获取信息失败', 204);
+    }
 
     /************激活账号****** */
     //激活账号验证码
@@ -198,7 +226,7 @@ class Person extends Base
                     break;
             }
             if ($rpm_model->getIsExceedNow($number)) {
-                return $this->create(['isExceed'=>true], '请注意申请时间', 200);
+                return $this->create(['isExceed' => true], '请注意申请时间', 200);
             }
             $res_ja = $ja_model->addApply($number, $post['step']);
             $res_update = true;
@@ -274,6 +302,37 @@ class Person extends Base
         } else {
             return $this->create(['step' => 0, 'review_status' => 1], '', 200);
         }
+    }
+
+    //组织关系转接申请
+    public function submitTransferApply(Request $request){
+
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $transfer_model = new TransferModel();
+        $post['number']=$number;
+        $post['receive_faculty'] = substr($post['receive_organization'],0,2);
+        $res = $transfer_model->createApply($post);
+        if($res){
+            return $this->create(['code' => 1], '提交成功', 200);
+        }else{
+            return $this->create(['code' => 0], '提交失败', 204);
+        }
+        
+    }
+    //获取申请进度
+    public function getTransferApplyStep(Request $request){
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $transfer_model = new TransferModel();
+        $data = $transfer_model->selectApplyStep($number);
+        if(empty($data)){
+            return $this->create(['code' => 1,'review_steps'=>0,'review_status'=>1], '提交成功', 200);
+        }
+        return $data;
+
+        
     }
 
 

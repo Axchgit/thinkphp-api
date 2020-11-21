@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-11-19 22:21:23
+ * @LastEditTime: 2020-11-22 02:36:14
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -22,6 +22,7 @@ use think\model\concern\SoftDelete;
 class Person extends Model
 
 {
+    
     //软删除
     use SoftDelete;
     protected $deleteTime = 'delete_time';
@@ -127,7 +128,7 @@ class Person extends Model
     public function updatePerson($data)
     {
         try {
-            $data = request()->only(['id', 'role']);
+            $data = request()->only(['id', 'role','faculty','party_branch']);
             $this->update($data);
             return true;
         } catch (\Exception $e) {
@@ -190,6 +191,12 @@ class Person extends Model
             return $e;
         }
     }
+    //根据查询条件单个信息查询
+    public function getInfoBySelectPost($post){
+        $data = $this->where($post)->find();
+
+        return $data;
+    }
     //获取人员信息,分页显示
 
     public function getAllPerson($list_rows, $config, $faculty, $post, $isSimple = false)
@@ -227,10 +234,10 @@ class Person extends Model
         // }
     }
 
-    public function getJson()
+    public function getJson($json_file_name)
     {
-        $fileName = config('app.json_path') . '/options.json';
-        $string = file_get_contents($fileName);
+        $file_path = config('app.json_path') . '/'.$json_file_name;
+        $string = file_get_contents($file_path);
         $json_data = json_decode($string, true);
         return $json_data;
     }

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Index.php
- * @LastEditTime: 2020-11-19 21:15:30
+ * @LastEditTime: 2020-11-21 02:01:51
  * @LastEditors: 罗曼
  */
 namespace app\controller;
@@ -44,6 +44,12 @@ class Index extends Base
         return [0=>1];
         return $person_model->getDictFromJson();
         
+    }
+
+    public function getJsonDataByFileName(){
+        $post =  request()->param();
+        $person_model = new PersonModel();
+        return $person_model->getJson($post['json_file_name']);        
     }
 
     

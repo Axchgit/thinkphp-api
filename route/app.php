@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-18 00:03:06
+ * @LastEditTime: 2020-11-22 02:21:57
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -55,6 +55,8 @@ Route::group('index', function () {
 Route::group('admin', function () {
     
     Route::post('importExcel', 'importExcel')->middleware('checkrequest', 3)->allowCrossDomain();
+    Route::post('importMaterialExcel', 'importMaterialExcel')->middleware('checkrequest', 4)->allowCrossDomain();
+
     Route::get('selectPersonAccount', 'selectPersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('updatePersonAccount', 'updatePersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('deletePersonAccount', 'deletePersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
@@ -78,6 +80,11 @@ Route::group('admin', function () {
     Route::get('getCountRecruitFaculty', 'getCountRecruitFaculty')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getCountRecruitPost', 'getCountRecruitPost')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getCountRecruitStage', 'getCountRecruitStage')->middleware('checkrequest', 4)->allowCrossDomain();
+
+    Route::get('viewTransferApply', 'viewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::post('reviewTransferApply', 'reviewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
+
+
     
     
 })->completeMatch()->prefix('Admin/');
@@ -90,7 +97,13 @@ Route::group('person', function () {
     Route::get('getIsOneStep', 'getIsOneStep')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getApplyStep', 'getApplyStep')->middleware('checkrequest', 8)->allowCrossDomain();
     
+    Route::post('submitTransferApply', 'submitTransferApply')->middleware('checkrequest', 8)->allowCrossDomain();
+    Route::get('getTransferApplyStep', 'getTransferApplyStep')->middleware('checkrequest', 8)->allowCrossDomain();
+
+
     
+    Route::get('getProfile', 'getProfile')->middleware('checkrequest', 9)->allowCrossDomain();
+
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Person/');
 
