@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-11-21 23:25:27
+ * @LastEditTime: 2020-11-22 03:17:12
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Transfer.php
@@ -64,6 +64,9 @@ class Transfer extends Model
         $select_post_new = [];
         foreach ($select_post as $k => $v) {
             $select_post_new['person.' . $k] = $v;
+            if ($k == 'faculty') {
+                $v > 9 ? $select_post_new['person.' . $k] = (string)$v : $select_post_new['person.' . $k] = '0' . (string)$v;
+            }
             if ($k == 'review_steps' || $k == 'review_status' || $k == 'receive_organization' || $k == 'reason') {
                 unset($select_post_new['person.' . $k]);
                 $select_post_new['transfer.' . $k] = $v;
@@ -84,11 +87,11 @@ class Transfer extends Model
             })->toArray();
         foreach ($list['data'] as $k => $v) {
             if ($v['party_branch'] == 0) {
-                $list['data'][$k]['party_branch'] = '未选择';
+                $list['data'][$k]['party_branch_label'] = '未选择';
             } else {
-                $list['data'][$k]['party_branch'] = $person_model->getJsonData('options.json', $v['faculty'], $v['party_branch'], true);
+                $list['data'][$k]['party_branch_label'] = $person_model->getJsonData('options.json', $v['faculty'], $v['party_branch'], true);
             }
-            $list['data'][$k]['receive_organization'] = $person_model->getJsonData('options.json', $v['receive_organization'], $v['party_branch'], true);
+            $list['data'][$k]['receive_organization_label'] = $person_model->getJsonData('options.json', $v['receive_organization'], $v['party_branch'], true);
         }
         return  $list;
     }

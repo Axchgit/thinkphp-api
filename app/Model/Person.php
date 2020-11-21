@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-11-22 02:36:14
+ * @LastEditTime: 2020-11-22 03:07:50
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -127,9 +127,10 @@ class Person extends Model
     // 修改人员信息
     public function updatePerson($data)
     {
+        $id = $this->where('number',$data['number'])->value('id');
         try {
-            $data = request()->only(['id', 'role','faculty','party_branch']);
-            $this->update($data);
+            // $data = request()->only(['id', 'role','faculty','party_branch']);
+            $this->update($data,['id'=>$id],['role','faculty','party_branch','major']);
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();

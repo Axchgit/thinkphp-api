@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-22 02:50:30
+ * @LastEditTime: 2020-11-22 03:19:29
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -46,7 +46,8 @@ class Admin extends Base
         }
     }
 
-    public function importMaterialExcel(){
+    public function importMaterialExcel()
+    {
         $post =  request()->param();
         $material_model = new MaterialModel();
         // return $this->create($post, '90', 204);
@@ -423,14 +424,15 @@ class Admin extends Base
                 if ($post['review_status'] === 2) {
                     $post['review_steps'] = $post['review_steps'] + 1;
                     $person_update_data = [
-                        'faculty' => $post['receive_faculty'],
+                        'faculty' => $post['receive_faculty']<10?'0'.(string)$post['receive_faculty']:(string)$post['receive_faculty'],
                         'party_branch' => $post['receive_organization'],
-                        'major' => $post['receive_major']
+                        'major' => $post['receive_major'],
+                        'number' => $post['number']
                     ];
                     $update_person_res = $person_model->updatePerson($person_update_data);
                     $update_transfer_res = $transfer_model->updateTransfer($post);
-                    if ($update_transfer_res && $update_person_res) {
-                        return $this->create('', '组织关系转接成功,已更改发起人组织信息');
+                    if ($update_transfer_res === true && $update_person_res === true) {
+                        return $this->create($person_update_data, '组织关系转接成功,已更改发起人组织信息');
                     } else {
                         return $this->create([$update_transfer_res, $update_person_res], '失败');
                     }
