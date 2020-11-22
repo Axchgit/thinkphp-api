@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-22 12:38:46
+ * @LastEditTime: 2020-11-23 02:22:00
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -24,6 +24,7 @@ use app\model\JoinApply as JoinApplyModel;
 use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 use app\model\Transfer as TransferModel;
 use app\model\Material as MaterialModel;
+use app\model\Bulletin as BullteinModel;
 
 
 use think\facade\Db;
@@ -454,9 +455,78 @@ class Admin extends Base
         if ($update_transfer_res) {
             return $this->create('', '审核成功');
         } else {
-            return $this->create($update_transfer_res, '审核失败');
+            return $this->create($update_transfer_res, '审核失败',204);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**************通告 */
+    public function sendBulletin(Request $request){
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $post['create_number'] = $number;
+        $bulletin_model = new BullteinModel();
+        $res = $bulletin_model->createBulletin($post);
+        if ($res===true) {
+            return $this->create('', '发送成功');
+        } else {
+            return $this->create($res, '发送失败',204);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    /*********** */
 
 
 

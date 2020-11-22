@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-22 13:08:54
+ * @LastEditTime: 2020-11-23 02:14:08
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -83,6 +83,9 @@ Route::group('admin', function () {
 
     Route::get('viewTransferApply', 'viewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::post('reviewTransferApply', 'reviewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
+
+    Route::post('sendBulletin', 'sendBulletin')->middleware('checkrequest', 4)->allowCrossDomain();
+
 
 
     
