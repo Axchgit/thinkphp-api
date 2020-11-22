@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-22 03:19:29
+ * @LastEditTime: 2020-11-22 12:38:46
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -404,6 +404,7 @@ class Admin extends Base
         return $list;
     }
 
+    //审核组织关系转出申请
     public function reviewTransferApply(Request $request)
     {
         $post = request()->param();

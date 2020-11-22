@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-22 02:21:57
+ * @LastEditTime: 2020-11-22 13:08:54
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -99,6 +99,7 @@ Route::group('person', function () {
     
     Route::post('submitTransferApply', 'submitTransferApply')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getTransferApplyStep', 'getTransferApplyStep')->middleware('checkrequest', 8)->allowCrossDomain();
+    Route::get('viewHistoryTransferApply', 'viewHistoryTransferApply')->middleware('checkrequest', 8)->allowCrossDomain();
 
 
     

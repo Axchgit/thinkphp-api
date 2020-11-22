@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-22 02:35:46
+ * @LastEditTime: 2020-11-22 16:20:17
  * @LastEditors: 罗曼
  */
 
@@ -303,7 +303,7 @@ class Person extends Base
             return $this->create(['step' => 0, 'review_status' => 1], '', 200);
         }
     }
-
+/*********组织关系转接 */
     //组织关系转接申请
     public function submitTransferApply(Request $request){
 
@@ -311,8 +311,19 @@ class Person extends Base
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         $transfer_model = new TransferModel();
-        $post['number']=$number;
-        $post['receive_faculty'] = substr($post['receive_organization'],0,2);
+        $person_model = new PersonModel();
+        $person_info = $person_model->getAllInfoByNumber($number);
+
+        // $post['number']=$number;
+        // $post['receive_faculty'] = substr($post['receive_organization'],0,2);
+        $add_data = [
+            'number'=>$number,
+            'receive_faculty'=>substr($post['receive_organization'],0,2),
+            'leave_faculty'=>$person_info['faculty'],
+            'leave_major'=>$person_info['major'],
+            'leave_organization'=>$person_info['party_branch']
+        ];
+        $post = array_merge($post,$add_data);        
         $res = $transfer_model->createApply($post);
         if($res){
             return $this->create(['code' => 1], '提交成功', 200);
@@ -327,13 +338,25 @@ class Person extends Base
         $number = $tooken_res['data']->uuid;
         $transfer_model = new TransferModel();
         $data = $transfer_model->selectApplyStep($number);
-        if(empty($data)){
-            return $this->create(['code' => 1,'review_steps'=>0,'review_status'=>1], '提交成功', 200);
-        }
-        return $data;
 
+        if(empty($data)){
+        // return $data;
+
+            return $this->create(['code' => 1,'review_steps'=>0,'review_status'=>1], '查询成功', 200);
+        }
+        return $data;        
+    }
+    //个人浏览历史转接信息
+    public function viewHistoryTransferApply(Request $request){
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $transfer_model = new TransferModel();
+        $list = $transfer_model->getHistroyByNumber($number);
+        return $this->create($list, '查询成功');
         
     }
+
+/********* */
 
 
 
