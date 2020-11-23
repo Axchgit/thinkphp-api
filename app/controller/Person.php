@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-22 16:20:17
+ * @LastEditTime: 2020-11-23 12:51:38
  * @LastEditors: 罗曼
  */
 
@@ -21,6 +21,11 @@ use app\model\Material as MaterialModel;
 use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 use app\model\JoinApply as JoinApplyModel;
 use app\model\Transfer as TransferModel;
+use app\model\Bulletin as BullteinModel;
+use app\model\BulletinRead as BullteinReadModel;
+
+
+
 
 
 
@@ -41,11 +46,11 @@ class Person extends Base
         if (!empty($data)) {
             $list['转出人姓名'] = $data['name'];
             $list['转出人身份证号码'] = $data['id_card'];
-            $list['转出人手机号'] = $data['phone_number'];            
+            $list['转出人手机号'] = $data['phone_number'];
             $list['转出人学院'] = $person_model->getJsonData('options.json', $data['faculty']);
             $list['转出人专业'] = $data['major'];
             $list['转出人班级'] = $data['class'];
-            $list['转出人性别'] = $data['sex'] = 1?'男':'女';
+            $list['转出人性别'] = $data['sex'] = 1 ? '男' : '女';
             if ($data['party_branch'] == 0) {
                 $list['转出团支部'] = '未选择';
             } else {
@@ -53,8 +58,8 @@ class Person extends Base
             }
             $list['转出人职务'] = $data['post'];
             $list['转出人学历'] = $data['education'];
-            $list['转出人党支部管理员'] =$person_model->getInfoBySelectPost(['role'=>4],['faculty'=>$data['faculty']])['name'];
-            $list['管理员联系方式'] =$person_model->getInfoBySelectPost(['role'=>4],['faculty'=>$data['faculty']])['phone_number'];
+            $list['转出人党支部管理员'] = $person_model->getInfoBySelectPost(['role' => 4], ['faculty' => $data['faculty']])['name'];
+            $list['管理员联系方式'] = $person_model->getInfoBySelectPost(['role' => 4], ['faculty' => $data['faculty']])['phone_number'];
             return $this->create($list, '获取成功', 200);
         }
 
@@ -303,9 +308,10 @@ class Person extends Base
             return $this->create(['step' => 0, 'review_status' => 1], '', 200);
         }
     }
-/*********组织关系转接 */
+    /*********组织关系转接 */
     //组织关系转接申请
-    public function submitTransferApply(Request $request){
+    public function submitTransferApply(Request $request)
+    {
 
         $post = request()->param();
         $tooken_res = $request->data;
@@ -317,46 +323,84 @@ class Person extends Base
         // $post['number']=$number;
         // $post['receive_faculty'] = substr($post['receive_organization'],0,2);
         $add_data = [
-            'number'=>$number,
-            'receive_faculty'=>substr($post['receive_organization'],0,2),
-            'leave_faculty'=>$person_info['faculty'],
-            'leave_major'=>$person_info['major'],
-            'leave_organization'=>$person_info['party_branch']
+            'number' => $number,
+            'receive_faculty' => substr($post['receive_organization'], 0, 2),
+            'leave_faculty' => $person_info['faculty'],
+            'leave_major' => $person_info['major'],
+            'leave_organization' => $person_info['party_branch']
         ];
-        $post = array_merge($post,$add_data);        
+        $post = array_merge($post, $add_data);
         $res = $transfer_model->createApply($post);
-        if($res){
+        if ($res) {
             return $this->create(['code' => 1], '提交成功', 200);
-        }else{
+        } else {
             return $this->create(['code' => 0], '提交失败', 204);
         }
-        
     }
     //获取申请进度
-    public function getTransferApplyStep(Request $request){
+    public function getTransferApplyStep(Request $request)
+    {
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         $transfer_model = new TransferModel();
         $data = $transfer_model->selectApplyStep($number);
 
-        if(empty($data)){
-        // return $data;
+        if (empty($data)) {
+            // return $data;
 
-            return $this->create(['code' => 1,'review_steps'=>0,'review_status'=>1], '查询成功', 200);
+            return $this->create(['code' => 1, 'review_steps' => 0, 'review_status' => 1], '查询成功', 200);
         }
-        return $data;        
+        return $data;
     }
     //个人浏览历史转接信息
-    public function viewHistoryTransferApply(Request $request){
+    public function viewHistoryTransferApply(Request $request)
+    {
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         $transfer_model = new TransferModel();
         $list = $transfer_model->getHistroyByNumber($number);
         return $this->create($list, '查询成功');
-        
     }
 
-/********* */
+    /********* */
+
+
+    /************通告 */
+
+    //获取通告
+    public function viewBulletin(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $person_model = new PersonModel();
+        $bulletin_model = new BullteinModel();
+
+        $post = $person_model->getInfoByNumber($number, 'post');
+
+        $list = $bulletin_model->getBulletin($number, $post);
+        return $list;
+    }
+
+    //阅读公告
+    public function readBulletin(Request $request)
+    {
+        $post = request()->param();
+
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $br_model = new BullteinReadModel();
+
+        $post['target_number'] = $number;
+
+        $res = $br_model->createBulletinRead($post);
+        if ($res === true) {
+            return $this->create('', '阅读成功');
+        }
+        return $this->create($res, '阅读失败');
+    }
+
+
+    /************* */
 
 
 

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-11-23 01:30:43
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Bulletin.php
- * @LastEditTime: 2020-11-23 02:25:15
+ * @LastEditTime: 2020-11-23 12:55:05
  * @LastEditors: 罗曼
  */
 
@@ -53,6 +53,35 @@ class Bulletin extends Model
         }
     }
 
+    //获取通告
+    public function getBulletin($number,$post)
+    {
+        $count = Db::table('bulletin')
+            ->alias('a')
+            ->leftjoin('bulletin_target b', 'a.id = b.bulletin_id')
+            ->leftjoin('bulletin_read c', 'a.id = c.bulletin_id')
+
+            ->field('a.*')
+            ->field('c.read_time')
+            // ->fieldRaw('count(*) AS 人数')
+            // ->fieldRaw('SUM(CASE WHEN c.read_time != null THEN 1 ELSE 0 END) AS reading')
+            ->fieldRaw('(CASE WHEN c.read_time <> null THEN 1 ELSE 2 END) AS reading')
+
+
+
+
+
+            //查询条件为空时,忽略该条件
+            ->whereRaw("((target_type=1 or target_type = 2) and target_person = '$number') or (target_type = 3 and target_person='$post') or (target_type = 4)")
+            // ->where('step', 1)
+            // // ->fetchSql(true)
+            // ->field('a.nation as 民族')
+            // ->fieldRaw('count(*) AS 人数')
+            // ->group('nation')
+            ->select();
+        return $count;
+    }
+    // (target_type = ‘指定用户或多个用户’ AND user = ‘用户id’) OR (target_type = ‘指定的用户群体’ AND user = ‘用户群体’ ) OR (target_type = ‘全部’)
 
 
 

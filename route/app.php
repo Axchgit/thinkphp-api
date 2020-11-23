@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-23 02:14:08
+ * @LastEditTime: 2020-11-23 12:52:08
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -108,6 +108,14 @@ Route::group('person', function () {
     
     Route::get('getProfile', 'getProfile')->middleware('checkrequest', 9)->allowCrossDomain();
 
+    Route::get('viewBulletin', 'viewBulletin')->middleware('checkrequest', 9)->allowCrossDomain();
+    Route::get('readBulletin', 'readBulletin')->middleware('checkrequest', 9)->allowCrossDomain();
+
+
+
+    
+
+    
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Person/');
 
