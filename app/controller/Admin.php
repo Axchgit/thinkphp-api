@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-11-23 02:22:00
+ * @LastEditTime: 2020-11-26 16:02:53
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -25,6 +25,7 @@ use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 use app\model\Transfer as TransferModel;
 use app\model\Material as MaterialModel;
 use app\model\Bulletin as BullteinModel;
+use app\model\DownloadFile as DownloadFileModel;
 
 
 use think\facade\Db;
@@ -426,7 +427,7 @@ class Admin extends Base
                 if ($post['review_status'] === 2) {
                     $post['review_steps'] = $post['review_steps'] + 1;
                     $person_update_data = [
-                        'faculty' => $post['receive_faculty']<10?'0'.(string)$post['receive_faculty']:(string)$post['receive_faculty'],
+                        'faculty' => $post['receive_faculty'] < 10 ? '0' . (string)$post['receive_faculty'] : (string)$post['receive_faculty'],
                         'party_branch' => $post['receive_organization'],
                         'major' => $post['receive_major'],
                         'number' => $post['number']
@@ -455,78 +456,115 @@ class Admin extends Base
         if ($update_transfer_res) {
             return $this->create('', '审核成功');
         } else {
-            return $this->create($update_transfer_res, '审核失败',204);
+            return $this->create($update_transfer_res, '审核失败', 204);
         }
     }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**************通告 */
-    public function sendBulletin(Request $request){
+    public function sendBulletin(Request $request)
+    {
         $post = request()->param();
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         $post['create_number'] = $number;
         $bulletin_model = new BullteinModel();
         $res = $bulletin_model->createBulletin($post);
-        if ($res===true) {
+        if ($res === true) {
             return $this->create('', '发送成功');
         } else {
-            return $this->create($res, '发送失败',204);
+            return $this->create($res, '发送失败', 204);
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     /*********** */
+
+
+
+    /**************公共文件 */
+    public function uploadPublicFile(Request $request)
+    {
+        $post = request()->param();
+        // return $this->create('', $post, 204);
+        $file = request()->file('file');
+        // $branch_value = request()->header('partyBranch');
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $df_model = new DownloadFileModel();
+        // $material_model = new MaterialModel();
+        // $ja_model = new JoinApplyModel();
+        // $rpm_model = new RecruitPartyMemberModel();
+        // return json(['code' => 200, $post, $header_data, $file->getOriginalName()]);
+
+        // 知识点:获取上传文件信息上传文件名:getOriginalName(); 获取上传文件类型信息:getOriginalMime(); 获取上传文件扩展名:getOriginalExtension()
+        try {
+            validate(['file' => ['filesize:51200000', 'fileExt:xls,xlsx,doc,docx,zip,rar,7z']])
+                ->check(['file' => $file]);
+            $save_path = \think\facade\Filesystem::disk('public')->putFileAs('index_file/'.$post['file_category'], $file, $file->getOriginalName());
+            $file_data = [
+                'uploader_number' => $number,
+                'file_category' => $post['file_category'],
+                'file_name' => $file->getOriginalName(),
+                'file_path' => $save_path,
+                'file_remarks' => $post['file_remarks']
+            ];
+            $res = $df_model->createFileInfo($file_data);
+            if ($res === true) {
+                return $this->create('', '上传成功');
+            } else {
+                return $this->create($res, '上传失败', 204);
+            }
+        } catch (\think\exception\ValidateException $e) {
+            return $this->create('', $e->getMessage(), 204);
+        }
+    }
+
+    //管理员获取公共文件
+    public function viewAllFile(Request $request)
+    {
+        $post = request()->param();
+
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $df_model = new DownloadFileModel();
+
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+
+        $res = $df_model->selectFileList($list_rows, ['query' => $post], $post);
+        if ($res[0] === true) {
+            return $this->create($res[1], '成功');
+        }
+        return $this->create($res[1], '失败', 204);
+    }
+    //删除公共文件信息及源文件
+    public function deleteFile(Request $request){
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $df_model = new DownloadFileModel();
+        $res = $df_model->deleteFileById($post['id']);
+        if ($res ===true) {
+            return $this->create('','成功');
+        }
+        return $this->create($res,'找不到文件,可能已被删除',204);
+    }
+
+    /*********** */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

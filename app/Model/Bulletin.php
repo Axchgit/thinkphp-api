@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-11-23 01:30:43
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Bulletin.php
- * @LastEditTime: 2020-11-24 14:25:09
+ * @LastEditTime: 2020-11-24 14:33:45
  * @LastEditors: 罗曼
  */
 
@@ -66,42 +66,12 @@ class Bulletin extends Model
             ->leftjoin('bulletin_target b', 'a.id = b.bulletin_id')
             ->leftjoin([$subsql=>'c'], 'a.id = c.bulletin_id')
             ->leftjoin('person d', 'a.create_number = d.number')
-
             ->field('a.*')
-            // ->field('c.target_number')
             ->field('d.name as creater')
-            // ->whereRaw("c.target_number=$number or c.target_number is null")
-            // ->whereRaw("not in c.target_number!=$number")
-            // ->whereNotExists("c.target_number!=$number")
-            // ->fieldRaw("(CASE WHEN (c.read_time is not null and c.target_number != '$number') THEN 0  ELSE 1 END) AS is_me")
-
-            // ->distinct(true)
-            // ->fieldRaw("(CASE WHEN (c.read_time is not null and c.target_number = '$number') THEN DATE_FORMAT(c.read_time,'%m-%d %h:%i')  ELSE 0 END) AS is_read")
-
-            // ->where('c.target_number','=',$number )
-            // ->whereRaw("c.target_number=$number")
-
-            // ->field('DATE_FORMAT(a.create_time,"%m-%d %h:%i")   as create_time')
-            // CONVERT_TZ(c.read_time,'GMT','MET')
-            // ->field('DATE_FORMAT(c.read_time,"%m-%d %h:%i")   as read_time')
-            // CONVERT_TZ('DATE_FORMAT(c.read_time,"%m-%d %h:%i")','GMT','+8:00') 
-            // DATE_FORMAT('CONVERT_TZ('DATE_FORMAT(c.read_time,"%m-%d %h:%i")','GMT','+8:00')',"%m-%d %h:%i")
-            // convert_tz(c.read_time, '+00:00', '+08:00')
-            // ->field('c.read_time')
-            ->fieldRaw("(CASE WHEN (c.read_time is not null and c.target_number = '$number') THEN DATE_FORMAT(c.read_time,'%m-%d %h:%i')  ELSE 0 END) AS is_read")
+            ->fieldRaw("(CASE WHEN (c.read_time is not null and c.target_number = '$number') THEN DATE_FORMAT(c.read_time,'%m-%d %H:%i')  ELSE 0 END) AS is_read")
             ->whereRaw("((target_type=1 or target_type = 2) and target_person = '$number') or (target_type = 3 and target_person='$info_post') or (target_type = 4)")
-            // ->order('is_me', 'desc')
-            // ->group('a.id')
-            // ->having("c.target_number  = '$number'")
-            ->paginate($list_rows, $isSimple, $config)->toArray();
-        // $data = $list['data'];
-        // foreach ($list['data'] as $k => $v) {
-        //     if ($v['is_me'] === 0) {
-        //         unset($list['data'][$k]);
-        //     }
-        //     // $list['data'][$k]['test'] = 1;
-        // }
-
+            ->order('a.id', 'desc')
+            ->paginate($list_rows, $isSimple, $config);
         return $list;
     }
     // (target_type = ‘指定用户或多个用户’ AND user = ‘用户id’) OR (target_type = ‘指定的用户群体’ AND user = ‘用户群体’ ) OR (target_type = ‘全部’)

@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-23 12:52:08
+ * @LastEditTime: 2020-11-26 15:00:15
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -47,7 +47,9 @@ Route::group('login', function () {
 /*******人员 */
 Route::group('index', function () {
     Route::get('getProfile', 'getProfile')->middleware('checkrequest', 9)->allowCrossDomain();
+    Route::get('getCountUnreadBulletin', 'getCountUnreadBulletin')->middleware('checkrequest', 9)->allowCrossDomain();
 
+    
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Index/');
 
@@ -83,11 +85,15 @@ Route::group('admin', function () {
 
     Route::get('viewTransferApply', 'viewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::post('reviewTransferApply', 'reviewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
-
+    //发送通告
     Route::post('sendBulletin', 'sendBulletin')->middleware('checkrequest', 4)->allowCrossDomain();
+    //获取文件
+    Route::get('viewAllFile', 'viewAllFile')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::post('uploadPublicFile', 'uploadPublicFile')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('deleteFile', 'deleteFile')->middleware('checkrequest', 4)->allowCrossDomain();
 
-
-
+    
+    
     
     
 })->completeMatch()->prefix('Admin/');

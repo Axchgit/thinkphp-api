@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-23 12:51:38
+ * @LastEditTime: 2020-11-23 17:17:20
  * @LastEditors: 罗曼
  */
 
@@ -370,14 +370,15 @@ class Person extends Base
     //获取通告
     public function viewBulletin(Request $request)
     {
+        $post = request()->param();
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         $person_model = new PersonModel();
         $bulletin_model = new BullteinModel();
 
-        $post = $person_model->getInfoByNumber($number, 'post');
-
-        $list = $bulletin_model->getBulletin($number, $post);
+        $info_post = $person_model->getInfoByNumber($number, 'post');
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $list = $bulletin_model->getBulletin($list_rows, ['query' => $post], $info_post,$number);
         return $list;
     }
 

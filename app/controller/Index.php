@@ -4,28 +4,31 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Index.php
- * @LastEditTime: 2020-11-21 02:01:51
+ * @LastEditTime: 2020-11-26 15:29:21
  * @LastEditors: 罗曼
  */
+
 namespace app\controller;
 
 use app\BaseController;
 use think\Request;
-
-use app\model\Employee as EmployeeModel;
-use app\model\EmployeeLogin as EmpLoginModel;
-use app\model\JoinApply;
-use app\model\Performance as PerformanceModel;
 
 use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
 use app\model\JoinApply as JoinApplyModel;
 use app\model\RecruitPartyMember as RecruitPartyMemberModel;
 use app\model\LoginRecord as LoginRecordModel;
+use app\model\Bulletin as BullteinModel;
+
+use app\model\DownloadFile as DownloadFileModel;
+
+
+
 
 class Index extends Base
 {
-    public function getProfile(Request $request){
+    public function getProfile(Request $request)
+    {
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         // return $number;
@@ -33,26 +36,67 @@ class Index extends Base
         $person_model = new PersonModel();
         $lg_model = new LoginRecordModel();
 
-        $login_record=$lg_model->selectRecord($number);
-        return $this->create(['login_record'=>$login_record], '查询成功');
-
-
+        $login_record = $lg_model->selectRecord($number);
+        return $this->create(['login_record' => $login_record], '查询成功');
     }
-
-    public function getDict(){
+    //获取未读通告统计
+    public function getCountUnreadBulletin(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
         $person_model = new PersonModel();
-        return [0=>1];
-        return $person_model->getDictFromJson();
-        
+        $bulletin_model = new BullteinModel();
+
+        $info_post = $person_model->getInfoByNumber($number, 'post');
+        $count = $bulletin_model->countUnreadBulletin($info_post, $number);
+        if (is_int($count)) {
+            return $this->create(['unread' => $count], '查询成功');
+        } else {
+            return $this->create($count, '查询失败', 204);
+        }
     }
 
-    public function getJsonDataByFileName(){
+    //获取公共文件
+    public function viewPublicFile()
+    {
+        $post = request()->param();
+        $df_model = new DownloadFileModel();
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+        $res = $df_model->selectFileList($list_rows, ['query' => $post], $post);
+        if ($res[0] === true) {
+            return $this->create($res[1], '成功');
+        }
+        return $this->create($res[1], '失败', 204);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function getDict()
+    {
+        $person_model = new PersonModel();
+        return [0 => 1];
+        return $person_model->getDictFromJson();
+    }
+
+    public function getJsonDataByFileName()
+    {
         $post =  request()->param();
         $person_model = new PersonModel();
-        return $person_model->getJson($post['json_file_name']);        
+        return $person_model->getJson($post['json_file_name']);
     }
 
-    
+
 
 
 
