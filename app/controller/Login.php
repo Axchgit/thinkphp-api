@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-11-12 12:05:08
+ * @LastEditTime: 2020-11-27 00:02:21
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Login.php
@@ -237,7 +237,6 @@ class Login extends Base
         //保存登录码信息到临时表
         $res =  $code_model->saveCode($post['number'], $log_code);
         //字符串截取指定片段
-        //优化逻辑:$code重复
         $v_code = substr($log_code, 10, 6);
         //查询账户对应email
         $person_info = $person_model->getAllInfoByNumber($post['number']);
