@@ -149,7 +149,21 @@ function checkToken($token)
   }
 }
 
-function emailHtmlModel($name, $code, $operation)
+/**
+ * @description: 
+ *@param : undefined
+
+ *@param mixed $name 姓名
+
+ *@param mixed $code  验证码
+
+ *@param mixed $operation 操作
+
+ *@param string $call 称呼 [同志,管理员]
+
+ * @return {*} 邮件模板
+ */
+function emailHtmlModel($name, $code, $operation, string $call = '管理员')
 {
   $email_html_alibaba = '<head>
     <base target="_blank" />
@@ -178,7 +192,7 @@ function emailHtmlModel($name, $code, $operation)
             </div>
             <div style="width:680px;padding:0 10px;margin:0 auto;">
                 <div style="line-height:1.5;font-size:14px;margin-bottom:25px;color:#4d4d4d;">
-                    <strong style="display:block;margin-bottom:15px;">尊敬的<span style="color: green">' . $name . '</span>管理员,<span style="color:#f60;font-size: 16px;"></span>您好！</strong>
+                    <strong style="display:block;margin-bottom:15px;">亲爱的<span style="color: green">' . $name . '</span>' . $call . ',<span style="color:#f60;font-size: 16px;"></span>您好！</strong>
                     <strong style="display:block;margin-bottom:15px;">
                         您正在进行<span style="color: red">' . $operation . '</span>操作，请在验证码输入框中输入：<span style="color:#f60;font-size: 24px">' . $code . '</span>，以完成操作。
                     </strong>
@@ -333,7 +347,7 @@ function emailHtmlModel($name, $code, $operation)
                          <span style="font-family: Nunito, Arial, Tahoma, Geneva, sans-serif;  font-size: 30px; line-height: 60px; font-weight: 700; letter-spacing: -1.5px;">您好,</span>
                          <span style="font-family: Nunito, Arial, Tahoma, Geneva, sans-serif; color: green; font-size: 30px; line-height: 60px; font-weight: 700; letter-spacing: -1.5px;">' . $name . '</span>
 
-                         <span style="font-family: Nunito, Arial, Tahoma, Geneva, sans-serif;  font-size: 30px; line-height: 60px; font-weight: 700; letter-spacing: -1.5px;">管理员</span>
+                         <span style="font-family: Nunito, Arial, Tahoma, Geneva, sans-serif;  font-size: 30px; line-height: 60px; font-weight: 700; letter-spacing: -1.5px;">'.$call . '</span>
                        </font>
                        <div style="height: 33px; line-height: 33px; font-size: 31px;">&nbsp;</div>
                        <font face="Nunito, sans-serif" color="#585858" style="font-size: 24px; line-height: 32px;">

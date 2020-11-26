@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-23 17:17:20
+ * @LastEditTime: 2020-11-26 18:07:08
  * @LastEditors: 罗曼
  */
 
@@ -80,7 +80,9 @@ class Person extends Base
         $time_code = (string)$time . (string)$code;
         //邮箱信息
         $title = '验证码';
-        $content = '你好, <b>' . $person_name . '同志</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在激活你的入党申请账户,你的验证码是:' . (string)$code;
+        $content = emailHtmlModel($person_name, (string)$code,'激活账号','同志');
+
+        // $content = '你好, <b>' . $person_name . '同志</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在激活你的入党申请账户,你的验证码是:' . (string)$code;
         if (!empty($person_name)) {
             $res = $person_model->savePersonCode($post['number'], $time_code, $title);
             if ($res) {
@@ -145,7 +147,8 @@ class Person extends Base
         $time_code = (string)$time . (string)$code;
         //邮箱内容
         $title = '验证码';
-        $content = '你好, <b>' . $person_name . '同志</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在找回你的入党申请账户密码,你的验证码是:' . (string)$code;
+        $content = emailHtmlModel($person_name, (string)$code,'激活账号','同志');
+        // $content = '你好, <b>' . $person_name . '同志</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在找回你的入党申请账户密码,你的验证码是:' . (string)$code;
         $res = $person_model->where('number', $post['number'])->where('email', $post['email'])->find();
         if (!empty($res)) {
             $res = $person_model->savePersonCode($post['number'], $time_code, $title);
