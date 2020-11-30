@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-26 15:00:15
+ * @LastEditTime: 2020-11-30 21:51:08
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -88,7 +88,7 @@ Route::group('admin', function () {
     //发送通告
     Route::post('sendBulletin', 'sendBulletin')->middleware('checkrequest', 4)->allowCrossDomain();
     //获取文件
-    Route::get('viewAllFile', 'viewAllFile')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::post('viewAllFile', 'viewAllFile')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::post('uploadPublicFile', 'uploadPublicFile')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('deleteFile', 'deleteFile')->middleware('checkrequest', 4)->allowCrossDomain();
 

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-11-25 15:19:46
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\DownloadFile.php
- * @LastEditTime: 2020-11-26 15:14:06
+ * @LastEditTime: 2020-11-30 22:14:37
  * @LastEditors: 罗曼
  */
 
@@ -37,9 +37,13 @@ class DownloadFile extends Model
     //获取
     public function selectFileList($list_rows, $config, $post,  $isSimple = false)
     {
-        $select_post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+        $select_post = array_diff_key($post, ["list_rows" => 0, "page" => 0,"file_name"=>'#$#$##$%FSDR*^&^%*']);
         try {
-            $list = $this->where($select_post)->paginate($list_rows, $isSimple, $config);
+            if(empty($post['file_name'])){
+                $list = $this->where($select_post)->paginate($list_rows, $isSimple, $config);
+            }else{
+                $list = $this->where($select_post)->whereLike('file_name','%'.$post['file_name'].'%')->paginate($list_rows, $isSimple, $config);
+            }
             return [true ,$list];
         } catch (\Exception $e) {
             return [false, $e->getMessage()];
