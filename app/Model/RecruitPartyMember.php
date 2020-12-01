@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-11-22 02:35:56
+ * @LastEditTime: 2020-12-02 01:50:05
  * @LastEditors: 罗曼
  */
 
@@ -192,13 +192,12 @@ class RecruitPartyMember extends Model
             ->select();
 
         $faculty_map =   ['文学与传媒学院', '马克思主义学院', '外国语学院', '数学与统计学院', '物理与机电工程学院', '化学与生物工程学院', '计算机与信息工程学院', '体育学院', '教师教育学院', '音乐舞蹈学院', '经济与管理学院', '历史与社会学院', '美术与设计学院'];
-        $list=[];
-        foreach($count as $k=>$v){
-            $list[$k]['学院'] = $faculty_map[(int)$count[$k]['学院']-1];
+        $list = [];
+        foreach ($count as $k => $v) {
+            $list[$k]['学院'] = $faculty_map[(int)$count[$k]['学院'] - 1];
             $list[$k]['人数'] = $count[$k]['人数'];
-
         }
-        
+
         return $list;
     }
 
@@ -239,6 +238,35 @@ class RecruitPartyMember extends Model
         }
         return $list;
     }
+
+    //统计政治面貌信息
+    public function countRecruitPoliticalStatus($faculty)
+    {
+        $subsql = Db::table('person')
+            ->alias('a')
+            ->join('recruit_party_member b', 'a.number = b.number')
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
+            ->distinct(true)
+            ->field('b.number')
+            ->buildSql();
+        $list = Db::table('person')
+            ->alias('a')
+            ->join([$subsql => 'b'], 'a.number = b.number')
+            ->field('a.political_status as 政治面貌')
+            ->fieldRaw('count(*) AS 人数')
+            ->group('political_status')
+            ->select();
+        $political_status_list = ['默认为共青团员', '群众', '共青团员', '苗子', '积极分子', '发展对象', '预备党员', '正式党员'];
+        $count = [];
+        foreach ($list as $k => $v) {
+            $count[$k]['政治面貌'] = $political_status_list[$k];
+            $count[$k]['人数'] = $list[$k]['人数'];
+        }
+        return $count;
+    }
+
+
+
 
 
 

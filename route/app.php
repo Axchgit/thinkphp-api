@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-11-30 21:51:08
+ * @LastEditTime: 2020-12-02 01:24:13
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -82,6 +82,8 @@ Route::group('admin', function () {
     Route::get('getCountRecruitFaculty', 'getCountRecruitFaculty')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getCountRecruitPost', 'getCountRecruitPost')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getCountRecruitStage', 'getCountRecruitStage')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('getCountRecruitPoliticalStatus', 'getCountRecruitPoliticalStatus')->middleware('checkrequest', 4)->allowCrossDomain();
+
 
     Route::get('viewTransferApply', 'viewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::post('reviewTransferApply', 'reviewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
