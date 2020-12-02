@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-02 01:28:02
+ * @LastEditTime: 2020-12-02 16:33:45
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -48,6 +48,7 @@ class Admin extends Base
         }
     }
 
+    //导入考核成绩
     public function importMaterialExcel()
     {
         $post =  request()->param();
@@ -59,6 +60,23 @@ class Admin extends Base
         } else {
             return $this->create('', $res, 200);
         }
+    }
+    //浏览考核成绩
+    public function viewMaterial(Request $request)
+    {
+        $post = request()->param();
+
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $material_model = new MaterialModel();
+
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+
+        $res = $material_model->selectFileList($list_rows, ['query' => $post], $post);
+        if ($res[0] === true) {
+            return $this->create($res[1], '成功');
+        }
+        return $this->create($res[1], '失败', 204);
     }
     /***********人员信息 */
     //查询人员信息
@@ -551,6 +569,8 @@ class Admin extends Base
     }
 
     /*********** */
+
+    
 
 
 
