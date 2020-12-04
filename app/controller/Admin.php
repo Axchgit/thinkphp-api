@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-03 22:14:48
+ * @LastEditTime: 2020-12-04 18:18:42
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -107,6 +107,20 @@ class Admin extends Base
             return $this->create($data, '查询成功');
         } else {
             return $this->create($data, '暂无数据', 204);
+        }
+    }
+
+    
+    //修改人员权限
+    public function updatePersonRole()
+    {
+        $post =  request()->param();
+        $person_model = new PersonModel();
+        $res = $person_model->updatePerson(['id'=>$post['id'],'role'=>$post['role'],'number'=>$post['number']]);
+        if ($res === true) {
+            return $this->create('', '修改成功', 200);
+        } else {
+            return $this->create('', $res, 204);
         }
     }
 
