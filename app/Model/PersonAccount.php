@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-17 12:09:09
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\PersonAccount.php
- * @LastEditTime: 2020-11-01 18:47:33
+ * @LastEditTime: 2020-12-04 17:51:52
  * @LastEditors: 罗曼
  */
 
@@ -46,6 +46,10 @@ class PersonAccount extends Model
             return $e->getMessage();
         }
     }
+    public function getAllInfoByNumber($number)
+    {
+        return $this->where('number', $number)->find();
+    }
     /**
      * @description: 根据uuid查询单个信息
      * @param {type} 
@@ -55,7 +59,16 @@ class PersonAccount extends Model
     {
         return Db::table('person')->where('number', $number)->value($value);
     }
-
+    //根据学号修改信息
+    public function updateByNumber($number, $value)
+    {
+        try {
+            $this->where('number', $number)->update($value);
+            return true;
+        } catch (\Exception $e) {
+            return $e;
+        }
+    }
     //更新密码
     public function updatePassword($number, $new_password)
     {
@@ -113,8 +126,8 @@ class PersonAccount extends Model
                 unset($data[$k]);
                 continue;
             }
-            $list[$k]['name']=$person_info['name'];
-            $list[$k]['role']=$person_info['role'];
+            $list[$k]['name'] = $person_info['name'];
+            $list[$k]['role'] = $person_info['role'];
 
             // PHP数组查询
             //学院

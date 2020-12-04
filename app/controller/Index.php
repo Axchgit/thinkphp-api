@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Index.php
- * @LastEditTime: 2020-11-26 15:29:21
+ * @LastEditTime: 2020-12-04 17:52:55
  * @LastEditors: 罗曼
  */
 
@@ -21,6 +21,8 @@ use app\model\LoginRecord as LoginRecordModel;
 use app\model\Bulletin as BullteinModel;
 
 use app\model\DownloadFile as DownloadFileModel;
+use app\model\TempCode as TempCodeModel;
+
 
 
 
@@ -35,9 +37,11 @@ class Index extends Base
 
         $person_model = new PersonModel();
         $lg_model = new LoginRecordModel();
+        $pa_model = new PersonAccountModel();
 
+        $pa_info = $pa_model->getAllInfoByNumber($number);
         $login_record = $lg_model->selectRecord($number);
-        return $this->create(['login_record' => $login_record], '查询成功');
+        return $this->create(['login_record' => $login_record,'pa_info'=>$pa_info], '查询成功');
     }
     //获取未读通告统计
     public function getCountUnreadBulletin(Request $request)
@@ -67,6 +71,59 @@ class Index extends Base
             return $this->create($res[1], '成功');
         }
         return $this->create($res[1], '失败', 204);
+    }
+        /**
+     * @description: 发送登录码
+     * @param {type} 
+     * @return {type} 
+     */
+    public function sendEmailCode(Request $request)
+    {
+        $post =  request()->param();
+        $tooken_res = $request->data;
+        
+        $number = $tooken_res['data']->uuid;
+        $person_model = new PersonModel();
+        $code_model = new TempCodeModel();
+
+        //PHP获得随机数-验证码
+        $v_code = rand(111111, 999999);
+        //PHP获取时间戳
+        $time = time();
+        //拼接时间戳与登录码
+        $log_code = (string)$time . (string)$v_code;
+
+        //删除之前的登录码
+        $code_model->deleteCode($number);
+        //保存登录码信息到临时表
+        $res =  $code_model->saveCode($number, $log_code,$post['msg'].'验证码');
+        //字符串截取指定片段
+        $v_code = substr($log_code, 10, 6);
+        //查询账户对应email
+        $person_info = $person_model->getAllInfoByNumber($number);
+
+        // $person_email = $person_model->getInfoByNumber($post['number'], 'email');
+        $title = '验证码';
+        // $data = json_decode($string, true);
+        $content=emailHtmlModel($person_info['name'],$v_code,$post['msg'] );
+        // return $this->create($content);
+
+        // $content = '你好, <b>' . $person_info['name'] . '</b>管理员! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在登录管理员账户,你的验证码是:' . (string)$v_code;
+
+        // $content = '你好, <b>朋友</b>! <br/><br/><span>你的验证码是:' . (string)$code;
+        if ($res === true) {
+            if (sendMail($person_info['email'], $title, $content)) {
+                $code = 200;
+                $msg = '发送成功';
+            } else {
+                $code = 204;
+                $msg = '发送失败';
+            }
+        } else {
+            $code = 204;
+            $msg = $res;
+        }
+        return $this->create('', $msg, $code);
     }
 
 

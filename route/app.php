@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-03 22:15:44
+ * @LastEditTime: 2020-12-04 16:22:35
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -48,6 +48,12 @@ Route::group('login', function () {
 Route::group('index', function () {
     Route::get('getProfile', 'getProfile')->middleware('checkrequest', 9)->allowCrossDomain();
     Route::get('getCountUnreadBulletin', 'getCountUnreadBulletin')->middleware('checkrequest', 9)->allowCrossDomain();
+    Route::get('sendEmailCode', 'sendEmailCode')->middleware('checkrequest', 9)->allowCrossDomain();
+
+    
+
+
+    
 
     
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
@@ -104,6 +110,10 @@ Route::group('admin', function () {
 
 /*******人员 */
 Route::group('person', function () {
+    Route::post('updatePasswordByEmailCode', 'updatePasswordByEmailCode')->middleware('checkrequest', 9)->allowCrossDomain();
+    Route::post('changeProfileByToken', 'changeProfileByToken')->middleware('checkrequest', 9)->allowCrossDomain();
+
+    
     Route::post('submitApplicatioin', 'submitApplicatioin')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getPartyBranch', 'getPartyBranch')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getIsOneStep', 'getIsOneStep')->middleware('checkrequest', 8)->allowCrossDomain();

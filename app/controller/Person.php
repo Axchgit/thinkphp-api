@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-11-26 18:07:08
+ * @LastEditTime: 2020-12-04 16:22:14
  * @LastEditors: 罗曼
  */
 
@@ -23,6 +23,9 @@ use app\model\JoinApply as JoinApplyModel;
 use app\model\Transfer as TransferModel;
 use app\model\Bulletin as BullteinModel;
 use app\model\BulletinRead as BullteinReadModel;
+
+use app\model\TempCode as TempCodeModel;
+
 
 
 
@@ -80,7 +83,7 @@ class Person extends Base
         $time_code = (string)$time . (string)$code;
         //邮箱信息
         $title = '验证码';
-        $content = emailHtmlModel($person_name, (string)$code,'激活账号','同志');
+        $content = emailHtmlModel($person_name, (string)$code, '激活账号', '同志');
 
         // $content = '你好, <b>' . $person_name . '同志</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在激活你的入党申请账户,你的验证码是:' . (string)$code;
         if (!empty($person_name)) {
@@ -147,7 +150,7 @@ class Person extends Base
         $time_code = (string)$time . (string)$code;
         //邮箱内容
         $title = '验证码';
-        $content = emailHtmlModel($person_name, (string)$code,'激活账号','同志');
+        $content = emailHtmlModel($person_name, (string)$code, '激活账号', '同志');
         // $content = '你好, <b>' . $person_name . '同志</b>! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在找回你的入党申请账户密码,你的验证码是:' . (string)$code;
         $res = $person_model->where('number', $post['number'])->where('email', $post['email'])->find();
         if (!empty($res)) {
@@ -206,6 +209,60 @@ class Person extends Base
         }
     }
     /**************************** */
+    /*****账户信息 */
+    public function updatePasswordByEmailCode(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        // $number = PersonModel::where('number', $post['work_num'])->value('uuid');
+        $tc_model = new TempCodeModel();
+        $pa_model = new PersonAccountModel();
+
+        $temp_code = $tc_model->getCodeByNumber($number);
+        if ($temp_code === false) {
+            return $this->create('', '系统错误', 204);
+        }
+
+        $string_code = (string)$temp_code;
+        $code = substr($string_code, 10, 6);
+        //获取当前时间戳
+        $now = time();
+        //获取登录码时间戳
+        $time = substr($string_code, 0, 10);
+        if ($code == $post['email_code']) {
+            if ($time + config("login.code_timeout") >= $now) {
+                $res = $pa_model->updatePassword($number, $post['password']);
+                if ($res) {
+                    return $this->create('', '成功');
+                } else {
+                    return $this->create('', '修改失败', 204);
+                }
+                // return $this->create(['number' => $post['number']], '成功', 200);
+            } else {
+                return $this->create('', '验证码超时', 201);
+            }
+        } else {
+            return $this->create('', '验证码错误', 204);
+        }
+    }
+    //修改个人简介
+    public function changeProfileByToken(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+
+        $pa_model = new PersonAccountModel();
+
+        $res = $pa_model->updateByNumber($number, ['profile' => $post['profile']]);
+        if ($res === true) {
+            return $this->create('', '修改成功');
+        } else {
+            return $this->create('', '修改失败', 204);
+        }
+    }
+    /************ */
 
     /**************************** 文件上传*/
     public function submitApplicatioin(Request $request)
@@ -381,7 +438,7 @@ class Person extends Base
 
         $info_post = $person_model->getInfoByNumber($number, 'post');
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-        $list = $bulletin_model->getBulletin($list_rows, ['query' => $post], $info_post,$number);
+        $list = $bulletin_model->getBulletin($list_rows, ['query' => $post], $info_post, $number);
         return $list;
     }
 
