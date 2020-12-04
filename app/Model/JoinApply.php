@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-11-21 18:55:07
+ * @LastEditTime: 2020-12-05 02:39:54
  * @LastEditors: 罗曼
  */
 
@@ -52,9 +52,9 @@ class JoinApply extends Model
         // }
     }
 
-    public function getApplyById($id,$value){
-        return $this->where('id',$id)->value($value);
-        
+    public function getApplyById($id, $value)
+    {
+        return $this->where('id', $id)->value($value);
     }
 
     //获取人员信息,分页显示 
@@ -73,17 +73,30 @@ class JoinApply extends Model
                 $select_post_new['join_apply.' . $k] = $v;
             }
         }
-        $list =  Db::view('person')
-            ->view('join_apply', 'id,step,review_status,reviewer,remarks,create_time', 'person.number=join_apply.number')
-            ->view('material', 'score as del', 'person.number=material.number', 'LEFT')
-
+        $subsql = Db::table('join_apply')
+            ->alias('a')
+            ->field('a.number,max(a.id) as id')
+            ->join('person b', 'a.number = b.number')
+            ->fieldRaw('max(step) as high_step')
+            ->group('b.number')
+            // ->select();
+            ->buildSql();
+        $list =  Db::table('person')
+            ->alias('a')
+            ->leftjoin('material b', 'a.number = b.number')
+            ->join([$subsql => 'c'], 'a.number = c.number')
+            ->join('join_apply d', 'd.id = c.id')
+            ->field('faculty,party_branch')
+            // ->field('c.*')
+            ->field('d.id,d.step,d.review_status,d.reviewer,d.remarks,d.create_time')
+            ->field('a.number,name,sex,faculty,party_branch')
+            
             ->fieldRaw('max(case when category=1 then score else "未认证" end) as certificate_one')
             ->fieldRaw('max(case when category=2 then score else "未认证" end) as certificate_two')
             ->fieldRaw('max(case when category=3 then score else "未认证" end) as certificate_three')
-            ->fieldRaw('max(case when category=4 then material.remarks else "" end) as applicationPath')
+            ->fieldRaw('max(case when category=4 then b.remarks else "" end) as applicationPath')
             // ->fieldRaw('max(stage) as stage')
             ->where($select_post_new)
-            // ->where('stage_time', '<', $now)
             ->whereRaw("faculty='$faculty' or '$faculty' =''")
             ->group('person.number')
             ->paginate($list_rows, $isSimple, $config)
