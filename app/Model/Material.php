@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-12-03 23:21:38
+ * @LastEditTime: 2020-12-05 02:45:53
  * @LastEditors: 罗曼
  */
 
@@ -175,10 +175,10 @@ class Material extends Model
                     $v > 9 ? $select_post['person.' . $k] = (string)$v : $select_post['person.' . $k] = '0' . (string)$v;
                 }
             }
-            //二级管理员查看时剔除非本学院人员信息
-            if ($role !== 4) {
-                $faculty = '';
-            }
+            // //二级管理员查看时剔除非本学院人员信息
+            // if ($role !== 4) {
+            //     $faculty = '';
+            // }
             // return $select_post;
             $list = Db::table('person')
                 ->alias('a')
