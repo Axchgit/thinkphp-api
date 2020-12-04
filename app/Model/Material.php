@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-11-22 02:50:08
+ * @LastEditTime: 2020-12-03 23:21:38
  * @LastEditors: 罗曼
  */
 
@@ -158,9 +158,60 @@ class Material extends Model
         //     // return '插入goods表失败';
         //     return $e->getMessage() . 'catch';
         // }
+    }
 
 
+    //分页获取考核成绩信息
+    public function getMaterial($list_rows, $config, $faculty, $post, $role, $isSimple = false)
+    {
+        try {
+            $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+            $select_post = [];
+            $now = date("Y-m-d H:i:s");
+            // array_push($select_post,'stage_time<'. $now);
+            foreach ($post as $k => $v) {
+                $select_post['person.' . $k] = $v;
+                if ($k == 'faculty') {
+                    $v > 9 ? $select_post['person.' . $k] = (string)$v : $select_post['person.' . $k] = '0' . (string)$v;
+                }
+            }
+            //二级管理员查看时剔除非本学院人员信息
+            if ($role !== 4) {
+                $faculty = '';
+            }
+            // return $select_post;
+            $list = Db::table('person')
+                ->alias('a')
+                ->join('material b', 'a.number = b.number')
 
+                ->fieldRaw('(case when category=1 then score else "" end) as score_1')
+                ->fieldRaw('(case when category=2 then score else "" end) as score_2')
+                ->fieldRaw('(case when category=3 then score else "" end) as score_3')
+                
+                ->fieldRaw('(case when category=1 then serial_number else "" end) as serial_number_1')
+                ->fieldRaw('(case when category=2 then serial_number else "" end) as serial_number_2')
+                ->fieldRaw('(case when category=3 then serial_number else "" end) as serial_number_3')
+                ->field('person.name,person.faculty,person.number')
+                
+                ->where($select_post)
+                ->where('category', '<>', 4)
+                ->whereRaw("faculty='$faculty' or '$faculty' =''")
+                // ->group('person.number')
+                ->paginate($list_rows, $isSimple, $config)
+                ->each(function ($item, $key) {
+                    $item['faculty'] = (int)$item['faculty'];
+                    return $item;
+                });
+            // foreach ($list as $key => $value) {
+            //     if (!empty($select_stage) && $list[$key]['stage'] != $select_stage) {
+            //         unset($list[$key]);
+            //     }
+            // }
+            return [true, $list];
+        } catch (\Exception $e) {
+            //throw $th;
+            return [false, $e->getMessage()];
+        }
     }
 
 

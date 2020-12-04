@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-02 16:33:45
+ * @LastEditTime: 2020-12-03 22:14:48
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -14,9 +14,6 @@ namespace app\controller;
 
 use think\Request;
 
-use app\model\Employee as EmployeeModel;
-use app\model\EmployeeLogin as EmpLoginModel;
-use app\model\Performance as PerformanceModel;
 
 use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
@@ -68,11 +65,18 @@ class Admin extends Base
 
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
         $material_model = new MaterialModel();
-
+        $person_model=new PersonModel();
+        //权限为4需要加查询条件
+        $faculty = '';
+        if ($role === 4) {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
+        }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
-
-        $res = $material_model->selectFileList($list_rows, ['query' => $post], $post);
+        // $list_rows, ['query' => $post], $faculty, $post, $role
+        $res = $material_model->getMaterial($list_rows, ['query' => $post],$faculty, $post, $role);
         if ($res[0] === true) {
             return $this->create($res[1], '成功');
         }
