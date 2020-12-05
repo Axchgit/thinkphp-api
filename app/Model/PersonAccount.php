@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-17 12:09:09
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\PersonAccount.php
- * @LastEditTime: 2020-12-05 16:02:28
+ * @LastEditTime: 2020-12-06 00:15:31
  * @LastEditors: 罗曼
  */
 
@@ -108,36 +108,33 @@ class PersonAccount extends Model
 
     public function getAllPersonAccount($list_rows, $config, $faculty, $post, $isSimple = false)
     {
-        //删除指定键名元素
-        $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
-
         $person_model = new PersonModel();
 
-        $list = $this->where($post)->paginate($list_rows, $isSimple, $config);
-        //获取json文件数据
-        $fileName = config('app.json_path') . '/options.json';
-        $string = file_get_contents($fileName);
-        $json_data = json_decode($string, true);
-        //拼装返回数据
-        foreach ($list as $k => $v) {
-            $person_info = $person_model->getAllInfoByNumber($v['number']);  //获取人员信息
-            //二级管理员查看时剔除非本学院人员信息
-            // if ($faculty == 4 && $faculty == $person_info['faculty']||$person_info['role']<4) {
-            //     unset($list[$k]);
-            //     continue;
-            // }
-            $list[$k]['name'] = $person_info['name'];
-            $list[$k]['role'] = $person_info['role'];
+        //删除指定键名元素
+        $select_post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+        $select_post_new = [];
+        $i = 0;
+        foreach ($select_post as $k => $v) {
+            // $select_post_new['a.' . $k] = $v;
+            $select_post_new[$i] = ['a.' . $k, '=', $v];
+            $i++;
+        }
+        if ($faculty !== '') {
+            $select_post_new[count($select_post_new)] = ['a.role', '>', 3];
+        }
 
-            // PHP数组查询
+        $list = Db::table('person')
+            ->alias('a')
+            ->join('person_account b', 'b.number = a.number')
+            ->field('name,a.number,role,faculty,party_branch,b.profile,b.id,password')
+            ->where($select_post_new)
+            ->paginate($list_rows, $isSimple, $config)->toArray();
+        //拼装返回数据
+        foreach ($list['data'] as $k => $v) {
             //学院
-            $found_arr = array_column($json_data, 'value'); //所查询键名组成的数组
-            $found_key = array_search($v['faculty'], $found_arr); //所查询数据在josn_data数组中的下标
-            $list[$k]['faculty'] = $json_data[$found_key]['label'];
-            //党支部
-            $found_child_arr = array_column($json_data[$found_key]['children'], 'value'); //所查询键名组成的数组
-            $found_child_key = array_search($v['party_branch'], $found_child_arr); //所查询数据在josn_data数组中的下标
-            $list[$k]['party_branch'] = $json_data[$found_key]['children'][$found_child_key]['label'];
+            $list['data'][$k]['faculty'] = $person_model->getJsonData('options.json', $v['faculty']);
+            // //党支部
+            $list['data'][$k]['party_branch'] = $v['party_branch'] == 0 ? '未选择' : $person_model->getJsonData('options.json', $v['faculty'], $v['party_branch'], true);
         }
 
         return $list;
