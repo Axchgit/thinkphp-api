@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-12-05 15:26:29
+ * @LastEditTime: 2020-12-06 00:40:57
  * @LastEditors: 罗曼
  */
 
@@ -37,7 +37,7 @@ use think\facade\Db;
 
 class Person extends Base
 {
-
+    //获取转出信息
     public function getProfile(Request $request)
     {
         //获取token中的学号
@@ -63,10 +63,22 @@ class Person extends Base
             $list['转出人学历'] = $data['education'];
             $list['转出人党支部管理员'] = $person_model->getInfoBySelectPost(['role' => 4], ['faculty' => $data['faculty']])['name'];
             $list['管理员联系方式'] = $person_model->getInfoBySelectPost(['role' => 4], ['faculty' => $data['faculty']])['phone_number'];
-            return $this->create($list, '获取成功', 200);
+            return $this->create($list, '获取成功');
         }
-
         return $this->create('', '获取信息失败', 204);
+    }
+    //获取个人信息
+    public function getMyInfo(Request $request){
+        $post = request()->param();
+
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $value = empty($post['value'])?'political_status':$post['value'];
+
+        $person_model = new PersonModel();
+        $data = $person_model->getInfoByNumber($number,$value);
+        return $this->create($data, '成功');
+
     }
 
     /************激活账号****** */

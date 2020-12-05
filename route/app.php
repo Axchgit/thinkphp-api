@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-04 16:22:35
+ * @LastEditTime: 2020-12-06 00:41:18
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -113,6 +113,7 @@ Route::group('person', function () {
     Route::post('updatePasswordByEmailCode', 'updatePasswordByEmailCode')->middleware('checkrequest', 9)->allowCrossDomain();
     Route::post('changeProfileByToken', 'changeProfileByToken')->middleware('checkrequest', 9)->allowCrossDomain();
 
+
     
     Route::post('submitApplicatioin', 'submitApplicatioin')->middleware('checkrequest', 8)->allowCrossDomain();
     Route::get('getPartyBranch', 'getPartyBranch')->middleware('checkrequest', 8)->allowCrossDomain();
@@ -126,6 +127,8 @@ Route::group('person', function () {
 
     
     Route::get('getProfile', 'getProfile')->middleware('checkrequest', 9)->allowCrossDomain();
+    Route::get('getMyInfo', 'getMyInfo')->middleware('checkrequest', 9)->allowCrossDomain();
+
 
     Route::get('viewBulletin', 'viewBulletin')->middleware('checkrequest', 9)->allowCrossDomain();
     Route::get('readBulletin', 'readBulletin')->middleware('checkrequest', 9)->allowCrossDomain();
