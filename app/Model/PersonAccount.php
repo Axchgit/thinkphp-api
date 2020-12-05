@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-17 12:09:09
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\PersonAccount.php
- * @LastEditTime: 2020-12-04 17:51:52
+ * @LastEditTime: 2020-12-05 16:02:28
  * @LastEditors: 罗曼
  */
 
@@ -122,10 +122,10 @@ class PersonAccount extends Model
         foreach ($list as $k => $v) {
             $person_info = $person_model->getAllInfoByNumber($v['number']);  //获取人员信息
             //二级管理员查看时剔除非本学院人员信息
-            if ($faculty == 4 && $faculty == $person_info['faculty']) {
-                unset($data[$k]);
-                continue;
-            }
+            // if ($faculty == 4 && $faculty == $person_info['faculty']||$person_info['role']<4) {
+            //     unset($list[$k]);
+            //     continue;
+            // }
             $list[$k]['name'] = $person_info['name'];
             $list[$k]['role'] = $person_info['role'];
 

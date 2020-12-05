@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-12-04 16:22:14
+ * @LastEditTime: 2020-12-05 15:26:29
  * @LastEditors: 罗曼
  */
 
@@ -53,7 +53,7 @@ class Person extends Base
             $list['转出人学院'] = $person_model->getJsonData('options.json', $data['faculty']);
             $list['转出人专业'] = $data['major'];
             $list['转出人班级'] = $data['class'];
-            $list['转出人性别'] = $data['sex'] = 1 ? '男' : '女';
+            $list['转出人性别'] = $data['sex'] === 1 ? '男' : '女';
             if ($data['party_branch'] == 0) {
                 $list['转出团支部'] = '未选择';
             } else {

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-12-05 02:39:54
+ * @LastEditTime: 2020-12-05 14:50:13
  * @LastEditors: 罗曼
  */
 
@@ -70,7 +70,7 @@ class JoinApply extends Model
             $select_post_new['person.' . $k] = $v;
             if ($k == 'step' || $k == 'review_status') {
                 unset($select_post_new['person.' . $k]);
-                $select_post_new['join_apply.' . $k] = $v;
+                $select_post_new['d.' . $k] = $v;
             }
         }
         $subsql = Db::table('join_apply')

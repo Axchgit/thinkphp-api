@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-11-22 03:07:50
+ * @LastEditTime: 2020-12-05 15:52:33
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -208,7 +208,7 @@ class Person extends Model
         if ($faculty == '') {
             $data = $this->where($post)->paginate($list_rows, $isSimple, $config);
         } else {
-            $data = $this->where($post)->where('faculty', $faculty)->paginate($list_rows, $isSimple = false, $config);
+            $data = $this->where($post)->where('faculty', $faculty)->where('role','>',3)->paginate($list_rows, $isSimple = false, $config);
         }
         //判断是否有值
         // if ($data->isEmpty()) {
