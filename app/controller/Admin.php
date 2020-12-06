@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-04 18:18:42
+ * @LastEditTime: 2020-12-06 16:18:37
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -68,7 +68,7 @@ class Admin extends Base
         $role = $tooken_res['data']->role;
 
         $material_model = new MaterialModel();
-        $person_model=new PersonModel();
+        $person_model = new PersonModel();
         //权限为4需要加查询条件
         $faculty = '';
         if ($role === 4) {
@@ -76,7 +76,7 @@ class Admin extends Base
         }
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
         // $list_rows, ['query' => $post], $faculty, $post, $role
-        $res = $material_model->getMaterial($list_rows, ['query' => $post],$faculty, $post, $role);
+        $res = $material_model->getMaterial($list_rows, ['query' => $post], $faculty, $post, $role);
         if ($res[0] === true) {
             return $this->create($res[1], '成功');
         }
@@ -110,13 +110,13 @@ class Admin extends Base
         }
     }
 
-    
+
     //修改人员权限
     public function updatePersonRole()
     {
         $post =  request()->param();
         $person_model = new PersonModel();
-        $res = $person_model->updatePerson(['id'=>$post['id'],'role'=>$post['role'],'number'=>$post['number']]);
+        $res = $person_model->updatePerson(['id' => $post['id'], 'role' => $post['role'], 'number' => $post['number']]);
         if ($res === true) {
             return $this->create('', '修改成功', 200);
         } else {
@@ -305,7 +305,7 @@ class Admin extends Base
         $is_high_admin = $role < 4;
         $number = $tooken_res['data']->uuid;
         $post = request()->param();
-        // $person_model = new PersonModel();
+        $person_model = new PersonModel();
         $ja_model = new JoinApplyModel();
         $rpm_model = new RecruitPartyMemberModel();
 
@@ -317,7 +317,7 @@ class Admin extends Base
         $post['remarks'] = '';
         $ja_res = $ja_model->updateJoinApply($post);
         // $post['stage'] = $post['step'] == 1 ? 1 : $post['step'] + 2;
-
+        //根据申请步骤判断审核后操作
         switch ($post['step']) {
             case 1:
                 $post['stage'] = 1;
@@ -343,8 +343,6 @@ class Admin extends Base
                     $post['review_status'] = 4;
                     $post['remarks'] = $post['introducer'];
                     $ja_res = $ja_model->updateJoinApply($post);
-                    // $rpm_res=true;
-                    // break;
                 }
                 // else if ($post['review_status'] == 2) {
                 $post['stage'] = 5;
@@ -355,6 +353,11 @@ class Admin extends Base
 
             case 4:
                 if (!$is_high_admin && $post['review_status'] == 2) {
+                    //申请通过后,修改人员政治面貌
+                    $res_person = $person_model->updateByNumber($post['number'], ['political_status' => 3]);
+                    if ($res_person !== true) {
+                        return $this->create('',  '系统未知错误', 204);
+                    }
                     $post['review_status'] = 4;
                     $ja_res = $ja_model->updateJoinApply($post);
                 }
@@ -368,6 +371,11 @@ class Admin extends Base
                 break;
             case 5:
                 if (!$is_high_admin && $post['review_status'] == 2) {
+                    //申请通过后,修改人员政治面貌
+                    $res_person = $person_model->updateByNumber($post['number'], ['political_status' => 4]);
+                    if ($res_person !== true) {
+                        return $this->create('',  '系统未知错误', 204);
+                    }
                     $post['review_status'] = 4;
                     $ja_res = $ja_model->updateJoinApply($post);
                 }
@@ -537,7 +545,7 @@ class Admin extends Base
         try {
             validate(['file' => ['filesize:51200000', 'fileExt:xls,xlsx,doc,docx,zip,rar,7z']])
                 ->check(['file' => $file]);
-            $save_path = \think\facade\Filesystem::disk('public')->putFileAs('index_file/'.$post['file_category'], $file, $file->getOriginalName());
+            $save_path = \think\facade\Filesystem::disk('public')->putFileAs('index_file/' . $post['file_category'], $file, $file->getOriginalName());
             $file_data = [
                 'uploader_number' => $number,
                 'file_category' => $post['file_category'],
@@ -574,21 +582,22 @@ class Admin extends Base
         return $this->create($res[1], '失败', 204);
     }
     //删除公共文件信息及源文件
-    public function deleteFile(Request $request){
+    public function deleteFile(Request $request)
+    {
         $post = request()->param();
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         $df_model = new DownloadFileModel();
         $res = $df_model->deleteFileById($post['id']);
-        if ($res ===true) {
-            return $this->create('','成功');
+        if ($res === true) {
+            return $this->create('', '成功');
         }
-        return $this->create($res,'找不到文件,可能已被删除',204);
+        return $this->create($res, '找不到文件,可能已被删除', 204);
     }
 
     /*********** */
 
-    
+
 
 
 
@@ -771,20 +780,20 @@ class Admin extends Base
         return $this->create(['columns' => ['发展阶段', '人数'], 'rows' => $result], '查询成功');
     }
 
-        //发展阶段统计
-        public function getCountRecruitPoliticalStatus(Request $request)
-        {
-            $tooken_res = $request->data;
-            $number = $tooken_res['data']->uuid;
-            $role = $tooken_res['data']->role;
-    
-            $person_model = new PersonModel();
-            $rpm_model = new RecruitPartyMemberModel();
-            $faculty = $role <= 3 ? '' : $person_model->getInfoByNumber($number, 'faculty');
-    
-            $result = $rpm_model->countRecruitPoliticalStatus($faculty);
-            return $this->create(['columns' => ['政治面貌', '人数'], 'rows' => $result], '查询成功');
-        }
+    //发展阶段统计
+    public function getCountRecruitPoliticalStatus(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
+        $person_model = new PersonModel();
+        $rpm_model = new RecruitPartyMemberModel();
+        $faculty = $role <= 3 ? '' : $person_model->getInfoByNumber($number, 'faculty');
+
+        $result = $rpm_model->countRecruitPoliticalStatus($faculty);
+        return $this->create(['columns' => ['政治面貌', '人数'], 'rows' => $result], '查询成功');
+    }
 
 
 

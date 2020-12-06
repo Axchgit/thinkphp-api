@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-12-05 15:52:33
+ * @LastEditTime: 2020-12-06 16:23:21
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -172,7 +172,7 @@ class Person extends Model
     {
         return Db::table('temp_code')->where('uuid', $number)->delete();
     }
-    //获取所有信息
+    //根据学号获取所有信息
     public function getAllInfoByNumber($number)
     {
         return $this->where('number', $number)->find();
@@ -183,13 +183,13 @@ class Person extends Model
         return $this->where('number', $number)->value($value);
     }
     //根据学号修改信息
-    public function updateByNumber($number, $value)
+    public function updateByNumber($number, $data)
     {
         try {
-            $this->where('number', $number)->update($value);
+            $this->where('number', $number)->update($data);
             return true;
         } catch (\Exception $e) {
-            return $e;
+            return $e->getMessage();
         }
     }
     //根据查询条件单个信息查询
