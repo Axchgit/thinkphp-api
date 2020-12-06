@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-06 00:41:18
+ * @LastEditTime: 2020-12-06 17:55:49
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -90,8 +90,10 @@ Route::group('admin', function () {
     Route::get('getCountRecruitPost', 'getCountRecruitPost')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getCountRecruitStage', 'getCountRecruitStage')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::get('getCountRecruitPoliticalStatus', 'getCountRecruitPoliticalStatus')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::get('getCountRecruitGrowthStage', 'getCountRecruitGrowthStage')->middleware('checkrequest', 4)->allowCrossDomain();
 
 
+    
     Route::get('viewTransferApply', 'viewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::post('reviewTransferApply', 'reviewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
     //发送通告

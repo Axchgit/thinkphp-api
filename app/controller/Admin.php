@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-06 16:18:37
+ * @LastEditTime: 2020-12-06 17:57:22
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -793,6 +793,21 @@ class Admin extends Base
 
         $result = $rpm_model->countRecruitPoliticalStatus($faculty);
         return $this->create(['columns' => ['政治面貌', '人数'], 'rows' => $result], '查询成功');
+    }
+
+    //发展阶段统计
+    public function getCountRecruitGrowthStage(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+
+        $person_model = new PersonModel();
+        $rpm_model = new RecruitPartyMemberModel();
+        $faculty = $role <= 3 ? '' : $person_model->getInfoByNumber($number, 'faculty');
+
+        $result = $rpm_model->countRecruitGrowthStage($faculty);
+        return $this->create(['columns' => ['成长阶段', '人数'], 'rows' => $result], '查询成功');
     }
 
 

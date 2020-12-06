@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-12-02 01:50:05
+ * @LastEditTime: 2020-12-06 21:04:12
  * @LastEditors: 罗曼
  */
 
@@ -50,6 +50,7 @@ class RecruitPartyMember extends Model
     public function getRecruit($list_rows, $config, $faculty, $post, $role, $isSimple = false)
     {
         $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+
         $select_post = [];
         $now = date("Y-m-d H:i:s");
         // array_push($select_post,'stage_time<'. $now);
@@ -141,13 +142,15 @@ class RecruitPartyMember extends Model
     //统计民族信息
     public function countRecruitNation($faculty)
     {
+        $subsql = Db::table('recruit_party_member')
+            ->fieldRaw('max(stage)')
+            ->field('number')
+            ->group('number')
+            ->buildSql();
         $count = Db::table('person')
             ->alias('a')
-            ->join('recruit_party_member b', 'a.number = b.number')
+            ->join([$subsql => 'b'], 'a.number = b.number')
             ->whereRaw("faculty='$faculty' or '$faculty' =''")
-            // ->where('step', 1)
-            // ->fetchSql(true)
-            ->where('stage', 1)
             ->field('a.nation as 民族')
             ->fieldRaw('count(*) AS 人数')
             ->group('nation')
@@ -157,60 +160,67 @@ class RecruitPartyMember extends Model
     //统计性别信息
     public function countRecruitSex(string $faculty = '')
     {
-        $list = [];
-        $count = Db::table('person')
+        $count = [];
+        $subsql = Db::table('recruit_party_member')
+            ->fieldRaw('max(stage)')
+            ->field('number')
+            ->group('number')
+            ->buildSql();
+        $list = Db::table('person')
             ->alias('a')
-            ->join('recruit_party_member b', 'a.number = b.number')
+            ->join([$subsql => 'b'], 'a.number = b.number')
             ->whereRaw("faculty='$faculty' or '$faculty' =''")
-            ->where('stage', 1)
             ->fieldRaw('SUM(CASE WHEN sex = 1 THEN 1 ELSE 0 END) AS 男')
             ->fieldRaw('SUM(CASE WHEN sex = 2 THEN 1 ELSE 0 END) AS 女')
             ->find();
-        $count = array_diff_key($count, ["id" => -1, "number" => -1]);
+        $list = array_diff_key($list, ["id" => -1, "number" => -1]);
         $i = 0;
-        foreach ($count as $k => $v) {
-            $list[$i]['性别'] = $k;
-            $list[$i]['人数'] = $v;
+        foreach ($list as $k => $v) {
+            $count[$i]['性别'] = $k;
+            $count[$i]['人数'] = $v;
             $i++;
         }
-        return $list;
+        return $count;
     }
 
     //统计学院信息
     public function countRecruitFaculty($faculty)
     {
-        $count = Db::table('person')
+        $subsql = Db::table('recruit_party_member')
+        ->fieldRaw('max(stage)')
+        ->field('number')
+        ->group('number')
+        ->buildSql();
+        $list = Db::table('person')
             ->alias('a')
-            ->join('recruit_party_member b', 'a.number = b.number')
+            ->join([$subsql => 'b'], 'a.number = b.number')
             ->whereRaw("faculty='$faculty' or '$faculty' =''")
-            // ->where('step', 1)
-            // ->fetchSql(true)
-            ->where('stage', 1)
             ->field('a.faculty as 学院')
             ->fieldRaw('count(*) AS 人数')
             ->group('faculty')
             ->select();
-
         $faculty_map =   ['文学与传媒学院', '马克思主义学院', '外国语学院', '数学与统计学院', '物理与机电工程学院', '化学与生物工程学院', '计算机与信息工程学院', '体育学院', '教师教育学院', '音乐舞蹈学院', '经济与管理学院', '历史与社会学院', '美术与设计学院'];
-        $list = [];
-        foreach ($count as $k => $v) {
-            $list[$k]['学院'] = $faculty_map[(int)$count[$k]['学院'] - 1];
-            $list[$k]['人数'] = $count[$k]['人数'];
+        $count = [];
+        foreach ($list as $k => $v) {
+            $count[$k]['学院'] = $faculty_map[(int)$list[$k]['学院'] - 1];
+            $count[$k]['人数'] = $v['人数'];
         }
 
-        return $list;
+        return $count;
     }
 
     //统计职务信息
     public function countRecruitPost($faculty)
     {
+        $subsql = Db::table('recruit_party_member')
+        ->fieldRaw('max(stage)')
+        ->field('number')
+        ->group('number')
+        ->buildSql();
         $count = Db::table('person')
             ->alias('a')
-            ->join('recruit_party_member b', 'a.number = b.number')
+            ->join([$subsql => 'b'], 'a.number = b.number')
             ->whereRaw("faculty='$faculty' or '$faculty' =''")
-            // ->where('step', 1)
-            // ->fetchSql(true)
-            ->where('stage', 1)
             ->field('a.post as 职务')
             ->fieldRaw('count(*) AS 人数')
             ->group('post')
@@ -221,22 +231,29 @@ class RecruitPartyMember extends Model
 
     public function countRecruitStage($faculty)
     {
-        $count = Db::table('person')
+        // $now = date("Y-m-d H:i:s");
+        $subsql = Db::table('recruit_party_member')
+        ->fieldRaw('max(stage) as stage')
+        ->where('stage_time', '<',date("Y-m-d H:i:s"))
+        ->field('number')
+        ->group('number')
+        ->buildSql();
+        $list = Db::table('person')
             ->alias('a')
-            ->join('recruit_party_member b', 'a.number = b.number')
+            ->join([$subsql => 'b'], 'a.number = b.number')
             ->whereRaw("faculty='$faculty' or '$faculty' =''")
-            ->fieldRaw('stage as 发展阶段')
+            ->field('stage')
             ->fieldRaw('count(*) as 人数')
             ->group('stage')
             ->select();
         // 成长阶段:1为申请入党,2为推优育苗,3为团组织推优,4为积极分子,5为发展对象,6为预备党员,7为预备党委审批,8为正式党员,9为正式党委审批',
         $stage_list = ['申请入党', '推优育苗', '团组织推优', '积极分子', '发展对象', '预备党员', '预备党委审批', '正式党员', '正式党委审批'];
-        $list = [];
-        foreach ($count as $k => $v) {
-            $list[$k]['发展阶段'] = $stage_list[$k];
-            $list[$k]['人数'] = !empty($count[$k + 1]) ? $count[$k]['人数'] - $count[$k + 1]['人数'] : $count[$k]['人数'];
+        $count = [];
+        foreach ($list as $k => $v) {
+            $count[$k]['发展阶段'] =$stage_list[$v['stage'] -1];
+            $count[$k]['人数'] = $v['人数'];
         }
-        return $list;
+        return $count;
     }
 
     //统计政治面貌信息
@@ -247,23 +264,53 @@ class RecruitPartyMember extends Model
             ->join('recruit_party_member b', 'a.number = b.number')
             ->whereRaw("faculty='$faculty' or '$faculty' =''")
             ->distinct(true)
+            // ->field('political_status')
             ->field('b.number')
+            // ->select();
             ->buildSql();
         $list = Db::table('person')
             ->alias('a')
             ->join([$subsql => 'b'], 'a.number = b.number')
-            ->field('a.political_status as 政治面貌')
+            ->field('a.political_status')
             ->fieldRaw('count(*) AS 人数')
             ->group('political_status')
             ->select();
-        $political_status_list = ['默认为共青团员', '群众', '共青团员', '苗子', '积极分子', '发展对象', '预备党员', '正式党员'];
+        $political_status_list = ['默认为共青团员', '群众', '共青团员', '预备党员', '正式党员'];
         $count = [];
         foreach ($list as $k => $v) {
-            $count[$k]['政治面貌'] = $political_status_list[$k];
-            $count[$k]['人数'] = $list[$k]['人数'];
+            $count[$k]['政治面貌'] = $political_status_list[$v['political_status']];
+            $count[$k]['人数'] = $v['人数'];
+            // $count[$k]['test']=$v;
         }
         return $count;
     }
+
+    //统计成长阶段信息
+    public function countRecruitGrowthStage($faculty)
+    {
+        $subsql = Db::table('join_apply')
+            ->fieldRaw('max(step) as high_step')
+            ->field('number')
+            ->where('review_status', 2)
+            ->group('number')
+            ->buildSql();
+        $list = Db::table('person')
+            ->alias('a')
+            ->join([$subsql => 'b'], 'a.number = b.number')
+            ->field('high_step')
+            ->fieldRaw('count(*) AS 人数')
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
+            ->group('high_step')
+            ->select();
+        $growth_stage_list = ['苗子', '积极分子', '发展对象', '预备党员', '正式党员'];
+        $count = [];
+        foreach ($list as $k => $v) {
+            $count[$k]['成长阶段'] = $growth_stage_list[$v['high_step'] -1];
+            $count[$k]['人数'] = $v['人数'];
+        }
+        return $count;
+    }
+
 
 
 
