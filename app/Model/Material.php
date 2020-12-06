@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-12-05 02:45:53
+ * @LastEditTime: 2020-12-06 21:16:03
  * @LastEditors: 罗曼
  */
 
@@ -70,7 +70,9 @@ class Material extends Model
 
 
             $material[$k]['score'] = $v['分数'];
-            $material[$k]['serial_number'] = $year . $v['学院代码'] . $v['类别'] . (string)$num;
+            if ($material[$k]['score'] >= 60) {
+                $material[$k]['serial_number'] = $year . $v['学院代码'] . $v['类别'] . (string)$num;
+            }
 
             // $person[$k]['name'] = $v['姓名'];
             // $person[$k]['sex'] = $v['性别'] === '男' ? 1 : 2;
@@ -187,12 +189,12 @@ class Material extends Model
                 ->fieldRaw('(case when category=1 then score else "" end) as score_1')
                 ->fieldRaw('(case when category=2 then score else "" end) as score_2')
                 ->fieldRaw('(case when category=3 then score else "" end) as score_3')
-                
+
                 ->fieldRaw('(case when category=1 then serial_number else "" end) as serial_number_1')
                 ->fieldRaw('(case when category=2 then serial_number else "" end) as serial_number_2')
                 ->fieldRaw('(case when category=3 then serial_number else "" end) as serial_number_3')
                 ->field('person.name,person.faculty,person.number')
-                
+
                 ->where($select_post)
                 ->where('category', '<>', 4)
                 ->whereRaw("faculty='$faculty' or '$faculty' =''")
