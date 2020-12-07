@@ -6,7 +6,7 @@
  * @Author: 罗曼
  * @Date: 2020-12-07 02:56:02
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\DataBack.php
- * @LastEditTime: 2020-12-07 14:08:39
+ * @LastEditTime: 2020-12-07 14:15:35
  * @LastEditors: 罗曼
  */
 
@@ -86,35 +86,6 @@ class DataBack extends Base
         array_multisort($keysValue, $sort, $array);
         return $array;
     }
-
-
-
-    // public function getDirContent($path = 'E:/backup/')
-    // {
-    //     if (!is_dir($path)) {
-    //         return false;
-    //     }
-    //     //readdir方法
-    //     /* $dir = opendir($path);
-    //     $arr = array();
-    //     while($content = readdir($dir)){
-    //       if($content != '.' && $content != '..'){
-    //         $arr[] = $content;
-    //       }
-    //     }
-    //     closedir($dir); */
-
-    //     //scandir方法
-    //     $arr = array();
-    //     $data = scandir($path);
-    //     foreach ($data as $value) {
-    //         if ($value != '.' && $value != '..') {
-    //             $arr[] = $value;
-    //         }
-    //     }
-    //     return $arr;
-    // }
-
 
 
     /**
