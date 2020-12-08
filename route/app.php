@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-06 17:55:49
+ * @LastEditTime: 2020-12-07 22:00:08
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -142,6 +142,21 @@ Route::group('person', function () {
     
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
 })->completeMatch()->prefix('Person/');
+
+
+
+/*******数据库备份 */
+Route::group('databack', function () {
+    Route::post('viewBackupFile', 'viewBackupFile')->middleware('checkrequest', 3)->allowCrossDomain();
+    Route::post('backupSqlApi', 'backupSqlApi')->middleware('checkrequest', 3)->allowCrossDomain();
+    Route::post('restoreThisSqlByBackupFile', 'restoreThisSqlByBackupFile')->middleware('checkrequest', 3)->allowCrossDomain();
+    Route::post('deleteBackupFile', 'deleteBackupFile')->middleware('checkrequest', 3)->allowCrossDomain();
+
+    // Route::post('changeProfileByToken', 'changeProfileByToken')->middleware('checkrequest', 9)->allowCrossDomain();
+
+    
+    // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
+})->completeMatch()->prefix('DataBack/');
 
 
 

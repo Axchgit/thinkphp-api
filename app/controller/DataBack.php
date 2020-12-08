@@ -6,7 +6,7 @@
  * @Author: 罗曼
  * @Date: 2020-12-07 02:56:02
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\DataBack.php
- * @LastEditTime: 2020-12-07 14:15:35
+ * @LastEditTime: 2020-12-09 02:25:23
  * @LastEditors: 罗曼
  */
 
@@ -20,8 +20,62 @@ namespace app\controller;
 
 class DataBack extends Base
 {
+
+    //获取备份文件列表
+    public function viewBackupFile()
+    {
+        $post = request()->param();
+        $file_path = !empty($post['file_path'])?$post['file_path']:'E:\/backup\/';
+        $res = $this->getDirContent( $file_path);
+        if ($res[0] !== true) {
+            return $this->create('', '系统错误');
+        }
+        return $this->create($res[1], '成功');
+    }
+    //备份数据库
+    public function backupSqlApi(){
+        $post = request()->param();
+        $dbname = !empty($post['dbname'])?$post['dbname']:'test';
+        $path = !empty($post['path'])?$post['path']:'+_+';
+        $this->backupSql($dbname,$path);
+        return $this->create('', '成功');
+    }
+    //数据库恢复数据
+    public function restoreThisSqlByBackupFile()
+    {
+        $post = request()->param();
+        $dbname = !empty($post['dbname'])?$post['dbname']:config('database.connections.mysql.database');
+        $this->restoreSql($post['file'],$dbname);
+        return $this->create('', '成功');
+    }
+    //删除数据库备份文件
+    public function deleteBackupFile()
+    {
+        $post = request()->param();
+        unlink($post['file']);
+        return $this->create('', '成功');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //查看目录内的文件和目录，并按生成时间排序
-    function getDirContent($file_path = 'E:/backup/')
+    function getDirContent($file_path)
     {
         //要查看的目录
         // $file_path = '../extend/';
@@ -50,19 +104,31 @@ class DataBack extends Base
                 } elseif ($filesize < 1024 * 1024 * 1024 * 1024) {
                     $size = sprintf("%01.2f", ($filesize / (1024 * 1024 * 1024))) . "GB";
                 }
+                // explode("\\",$file_path);
+                
+                // substr($v,0,strpos($v, '_2'));
+                $new_file_path = stripslashes($file_path);
                 $list[] = [
-                    'file' =>$file_path. $v,
+                    'index' => $k,
+                    'file' => $new_file_path . $v,
+                    // 'dbname' => explode("-", $v)[0],
+                    'dbname' => substr($v,0,strpos($v, '_2')),
                     'size' => $size,
-                    'create_time' => filemtime($file_path . $v),
-                    'create_date' => date('Y-m-d H:i:s', filemtime($file_path . $v)),
+                    'create_time' => filemtime($new_file_path . $v),
+                    'create_date' => date('Y-m-d H:i:s', filemtime($new_file_path . $v)),
                 ];
             }
         }
 
         //根据文件和目录生成时间按倒序排列
         $list = $this->arraySort($list, 'create_time', SORT_DESC);
-        
-        return $this->create($list,'成功');
+        if (empty($list)) {
+            return [false];
+        } else {
+            return [true, $list];
+        }
+
+        // return $this->create($list,'成功');
 
         // echo '<pre>';
         // print_r($list);
@@ -96,31 +162,34 @@ class DataBack extends Base
 
      *@return {*}
      */
-    public function backupSql($dbname = 'test', string $backupFile = '+_+_',$mysqldump_path ="D:\/wamp64\/bin\/mysql\/mysql5.7.24\/bin\/")
+    public function backupSql($dbname = 'test', string $backupFile = '+_+', $mysqldump_path = "D:\/wamp64\/bin\/mysql\/mysql5.7.24\/bin\/")
     {
         // $dbhost = '127.0.0.1';config
         $dbhost = config('database.connections.mysql.hostname');
         $dbuser = config('database.connections.mysql.username');
         $dbpass = config('database.connections.mysql.password');
-        if ($backupFile === '+_+_') {
+
+        
+        if ($backupFile === '+_+') {
             $backupFile = 'E:/backup/' . $dbname . '_' . date("Y-m-d_His") . '.sql';
         }
         if ($dbpass === '') {
-            exec($mysqldump_path."mysqldump -h $dbhost -u$dbuser  $dbname > $backupFile");
+            exec($mysqldump_path . "mysqldump -h $dbhost -u$dbuser  $dbname > $backupFile");
         } else {
-            exec($mysqldump_path."mysqldump -h $dbhost -u$dbuser -p$dbpass  $dbname > $backupFile");
+            exec($mysqldump_path . "mysqldump -h $dbhost -u$dbuser -p$dbpass  $dbname > $backupFile");
         }
         return  stripslashes($backupFile);
     }
     /**
      * @description: 数据库还原
-     *@param string $dbname
+     *@param string $dbname 数据库名称
+     *@param string $backupFile 
+     *@param string $mysqldump_path
 
-     *@param string $backupFile
 
      *@return {*}
      */
-    public function restoreSql($backupFile, $dbname = 'test',$mysqldump_path ="D:\/wamp64\/bin\/mysql\/mysql5.7.24\/bin\/")
+    public function restoreSql($backupFile, $dbname = 'test', $mysqldump_path = "D:\/wamp64\/bin\/mysql\/mysql5.7.24\/bin\/")
     {
 
         // $dbhost = '127.0.0.1';config
@@ -129,9 +198,9 @@ class DataBack extends Base
         $dbpass = config('database.connections.mysql.password');
         $backupFile = stripslashes($backupFile);
         if ($dbpass === '') {
-            exec($mysqldump_path."mysql -h $dbhost -u$dbuser  $dbname < $backupFile");
+            exec($mysqldump_path . "mysql -h $dbhost -u$dbuser  $dbname < $backupFile");
         } else {
-            exec($mysqldump_path."mysql  -h $dbhost -u$dbuser -p$dbpass  $dbname < $backupFile");
+            exec($mysqldump_path . "mysql  -h $dbhost -u$dbuser -p$dbpass  $dbname < $backupFile");
         }
         return $backupFile;
     }
