@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-06 17:57:22
+ * @LastEditTime: 2020-12-10 01:49:07
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -81,6 +81,46 @@ class Admin extends Base
             return $this->create($res[1], '成功');
         }
         return $this->create($res[1], '失败', 204);
+    }
+
+    public function editMaterial(Request $request)
+    {
+        $post = request()->param();
+
+        $tooken_res = $request->data;
+        // $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $material_model = new MaterialModel();
+        // $person_model = new PersonModel();
+        try {
+            if ($post['materialOne'] !== true) {
+                if($material_model->where(['number' => $post['number'], 'category' => 1])->find() !==null){
+                    $res = $material_model->where(['number' => $post['number'], 'category' => 1])->update(['serial_number' => $post['serial_number_1'], 'score' => $post['score_1']]);
+
+                }else{
+                    $res = $material_model->save(['number' => $post['number'], 'category' => 1,'serial_number' => $post['serial_number_1'], 'score' => $post['score_1']]);
+                }
+            }
+            if ($post['materialTwo'] !== true) {
+                if($material_model->where(['number' => $post['number'], 'category' => 2])->find() !==null){
+                    $res = $material_model->where(['number' => $post['number'], 'category' => 2])->update(['serial_number' => $post['serial_number_2'], 'score' => $post['score_2']]);
+
+                }else{
+                    $res = $material_model->save(['number' => $post['number'], 'category' => 2,'serial_number' => $post['serial_number_2'], 'score' => $post['score_2']]);
+                }
+            }
+            if ($post['materialThree'] !== true) {
+                if($material_model->where(['number' => $post['number'], 'category' => 3])->find() !==null){
+                    $res = $material_model->where(['number' => $post['number'], 'category' => 3])->update(['serial_number' => $post['serial_number_3'], 'score' => $post['score_3']]);
+
+                }else{
+                    $res = $material_model->save(['number' => $post['number'], 'category' => 3,'serial_number' => $post['serial_number_3'], 'score' => $post['score_3']]);
+                }
+            }
+            return $this->create($res, '成功');
+        } catch (\Exception $e) {
+            return $this->create('', $e->getMessage(), 204);
+        }
     }
     /***********人员信息 */
     //查询人员信息

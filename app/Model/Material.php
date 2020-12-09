@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-12-06 21:16:03
+ * @LastEditTime: 2020-12-10 00:08:52
  * @LastEditors: 罗曼
  */
 
@@ -202,6 +202,9 @@ class Material extends Model
                 ->paginate($list_rows, $isSimple, $config)
                 ->each(function ($item, $key) {
                     $item['faculty'] = (int)$item['faculty'];
+                    $item['materialOne']= $item['serial_number_1']>10;
+                    $item['materialTwo']= $item['serial_number_2']>10;
+                    $item['materialThree']= $item['serial_number_3']>10;
                     return $item;
                 });
             // foreach ($list as $key => $value) {
