@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-12-06 16:23:21
+ * @LastEditTime: 2020-12-13 15:50:25
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -22,7 +22,7 @@ use think\model\concern\SoftDelete;
 class Person extends Model
 
 {
-    
+
     //软删除
     use SoftDelete;
     protected $deleteTime = 'delete_time';
@@ -46,6 +46,24 @@ class Person extends Model
             $person[$k]['phone_number'] = $v['手机号'];
             $person[$k]['email'] = $v['邮箱'];
             $person[$k]['comment'] = $v['备注'];
+            $person[$k]['native_place'] = $v['籍贯地址'];
+            $person[$k]['political_status'] = $v['政治面貌'];
+            switch ($v['政治面貌']) {
+                case '群众':
+                    $person[$k]['political_status'] = 1;
+                    break;
+                case '共青团员':
+                    $person[$k]['political_status'] = 2;
+                    break;
+                case '预备党员':
+                    $person[$k]['political_status'] = 3;
+                    break;
+                case '正式党员':
+                    $person[$k]['political_status'] = 4;
+                    break;
+                default:
+                    $person[$k]['political_status'] = 1;
+            }
             switch ($person[$k]['post']) {
                 case '学生':
                     $person[$k]['role'] = 8;
@@ -127,10 +145,10 @@ class Person extends Model
     // 修改人员信息
     public function updatePerson($data)
     {
-        $id = $this->where('number',$data['number'])->value('id');
+        $id = $this->where('number', $data['number'])->value('id');
         try {
             // $data = request()->only(['id', 'role','faculty','party_branch']);
-            $this->update($data,['id'=>$id],['role','faculty','party_branch','major']);
+            $this->update($data, ['id' => $id], ['role', 'email', 'phone_number', 'political_status', 'faculty', 'party_branch', 'major']);
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -193,7 +211,8 @@ class Person extends Model
         }
     }
     //根据查询条件单个信息查询
-    public function getInfoBySelectPost($post){
+    public function getInfoBySelectPost($post)
+    {
         $data = $this->where($post)->find();
 
         return $data;
@@ -208,7 +227,7 @@ class Person extends Model
         if ($faculty == '') {
             $data = $this->where($post)->paginate($list_rows, $isSimple, $config);
         } else {
-            $data = $this->where($post)->where('faculty', $faculty)->where('role','>',3)->paginate($list_rows, $isSimple = false, $config);
+            $data = $this->where($post)->where('faculty', $faculty)->where('role', '>', 3)->paginate($list_rows, $isSimple = false, $config);
         }
         //判断是否有值
         // if ($data->isEmpty()) {
@@ -237,7 +256,7 @@ class Person extends Model
 
     public function getJson($json_file_name)
     {
-        $file_path = config('app.json_path') . '/'.$json_file_name;
+        $file_path = config('app.json_path') . '/' . $json_file_name;
         $string = file_get_contents($file_path);
         $json_data = json_decode($string, true);
         return $json_data;

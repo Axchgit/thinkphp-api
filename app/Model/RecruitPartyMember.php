@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-12-06 21:04:12
+ * @LastEditTime: 2020-12-13 16:14:38
  * @LastEditors: 罗曼
  */
 
@@ -12,6 +12,8 @@
 namespace app\model;
 
 // use PHPExcel_IOFactory;
+use think\model\concern\SoftDelete;
+
 
 // use think\Db;
 use think\Model;
@@ -24,6 +26,8 @@ use app\model\Person as PersonModel;
 
 class RecruitPartyMember extends Model
 {
+    // use SoftDelete;
+    // protected $deleteTime = 'delete_time';
     //添加发展党员信息
     public function createRecruit($data)
     {

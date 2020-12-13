@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-10 01:49:07
+ * @LastEditTime: 2020-12-13 16:21:11
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -14,6 +14,7 @@ namespace app\controller;
 
 use think\Request;
 
+use think\model\concern\SoftDelete;
 
 use app\model\Person as PersonModel;
 use app\model\PersonAccount as PersonAccountModel;
@@ -25,12 +26,13 @@ use app\model\Bulletin as BullteinModel;
 use app\model\DownloadFile as DownloadFileModel;
 
 
-use think\facade\Db;
-
-use function PHPSTORM_META\type;
-
 class Admin extends Base
 {
+
+
+    // protected $defaultSoftDelete = 0;
+
+
     public function importExcel()
     {
         $post =  request()->param();
@@ -94,27 +96,24 @@ class Admin extends Base
         // $person_model = new PersonModel();
         try {
             if ($post['materialOne'] !== true) {
-                if($material_model->where(['number' => $post['number'], 'category' => 1])->find() !==null){
+                if ($material_model->where(['number' => $post['number'], 'category' => 1])->find() !== null) {
                     $res = $material_model->where(['number' => $post['number'], 'category' => 1])->update(['serial_number' => $post['serial_number_1'], 'score' => $post['score_1']]);
-
-                }else{
-                    $res = $material_model->save(['number' => $post['number'], 'category' => 1,'serial_number' => $post['serial_number_1'], 'score' => $post['score_1']]);
+                } else {
+                    $res = $material_model->save(['number' => $post['number'], 'category' => 1, 'serial_number' => $post['serial_number_1'], 'score' => $post['score_1']]);
                 }
             }
             if ($post['materialTwo'] !== true) {
-                if($material_model->where(['number' => $post['number'], 'category' => 2])->find() !==null){
+                if ($material_model->where(['number' => $post['number'], 'category' => 2])->find() !== null) {
                     $res = $material_model->where(['number' => $post['number'], 'category' => 2])->update(['serial_number' => $post['serial_number_2'], 'score' => $post['score_2']]);
-
-                }else{
-                    $res = $material_model->save(['number' => $post['number'], 'category' => 2,'serial_number' => $post['serial_number_2'], 'score' => $post['score_2']]);
+                } else {
+                    $res = $material_model->save(['number' => $post['number'], 'category' => 2, 'serial_number' => $post['serial_number_2'], 'score' => $post['score_2']]);
                 }
             }
             if ($post['materialThree'] !== true) {
-                if($material_model->where(['number' => $post['number'], 'category' => 3])->find() !==null){
+                if ($material_model->where(['number' => $post['number'], 'category' => 3])->find() !== null) {
                     $res = $material_model->where(['number' => $post['number'], 'category' => 3])->update(['serial_number' => $post['serial_number_3'], 'score' => $post['score_3']]);
-
-                }else{
-                    $res = $material_model->save(['number' => $post['number'], 'category' => 3,'serial_number' => $post['serial_number_3'], 'score' => $post['score_3']]);
+                } else {
+                    $res = $material_model->save(['number' => $post['number'], 'category' => 3, 'serial_number' => $post['serial_number_3'], 'score' => $post['score_3']]);
                 }
             }
             return $this->create($res, '成功');
@@ -169,7 +168,8 @@ class Admin extends Base
     {
         $post =  request()->param();
         $person_model = new PersonModel();
-        $res = $person_model->updatePerson($post);
+        $update_post = array_diff_key($post, ["party_branch" => '&*&*&']);
+        $res = $person_model->updatePerson($update_post);
         if ($res === true) {
             return $this->create('', '修改成功', 200);
         } else {
@@ -445,7 +445,7 @@ class Admin extends Base
         }
     }
 
-    //浏览查询申请列表
+    //浏览发展党员列表
     public function viewRecruit(Request $request)
     {
         $post = request()->param();
@@ -465,6 +465,19 @@ class Admin extends Base
         $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
         $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post, $role);
         return $this->create($list, '查询成功');
+    }
+
+    //删除发展党员信息
+    public function deleteRecruit()
+    {
+        $post = request()->param();
+        $rpm_model = new RecruitPartyMemberModel();
+
+        $rpm_res = $rpm_model->deleteRecruit([['number', '=', $post['number']]]);
+        if ($rpm_res === true) {
+            return $this->create('', '删除成功');
+        }
+        return $this->create($rpm_res, '删除失败', 204);
     }
 
     //获取组织关系转接申请信息
@@ -542,6 +555,19 @@ class Admin extends Base
         } else {
             return $this->create($update_transfer_res, '审核失败', 204);
         }
+    }
+
+    //删除发展党员信息
+    public function deleteTransfer()
+    {
+        $post = request()->param();
+        $transfer_model = new TransferModel();
+
+        $res = $transfer_model->deleteTransfer($post);
+        if ($res === true) {
+            return $this->create('', '删除成功');
+        }
+        return $this->create($res, '删除失败', 204);
     }
 
 

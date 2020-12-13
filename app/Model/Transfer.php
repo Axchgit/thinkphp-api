@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-11-22 16:42:05
+ * @LastEditTime: 2020-12-13 16:56:52
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Transfer.php
@@ -10,9 +10,8 @@
 
 namespace app\model;
 
-// use PHPExcel_IOFactory;
+use think\model\concern\SoftDelete;
 
-// use think\Db;
 use think\Model;
 use think\facade\Db;
 
@@ -20,13 +19,16 @@ use app\model\Person as PersonModel;
 
 class Transfer extends Model
 {
+    //软删除
+    use SoftDelete;
+    protected $deleteTime = 'delete_time';
 
     //添加申请记录
     public function createApply($data)
     {
         try {
             // Transfer::create($data,['number', 'contacts_phone','receive_organization','reason','remarks','review_status','reviewer']);
-            $this->create($data, ['number', 'contacts_phone','leave_faculty','leave_major','leave_organization', 'receive_organization', 'receive_faculty', 'reason', 'remarks', 'review_status', 'low_reviewer', 'high_reviewer']);
+            $this->create($data, ['number', 'contacts_phone', 'leave_faculty', 'leave_major', 'leave_organization', 'receive_organization', 'receive_faculty', 'reason', 'remarks', 'review_status', 'low_reviewer', 'high_reviewer']);
             return true;
         } catch (\Exception $e) {
             return  $e->getMessage();
@@ -41,7 +43,7 @@ class Transfer extends Model
 
             // $data = request()->only(['id', 'review_status','review_steps','receive_major', 'out_low_reviewer','in_low_reviewer','high_reviewer']);
             // return $data;
-            $this->update($data,['id'=>$data['id']],['review_status','review_steps','receive_major', 'out_low_reviewer','in_low_reviewer','high_reviewer']);
+            $this->update($data, ['id' => $data['id']], ['review_status', 'review_steps', 'receive_major', 'out_low_reviewer', 'in_low_reviewer', 'high_reviewer']);
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -56,24 +58,25 @@ class Transfer extends Model
     }
 
     //个人浏览历史记录
-    public function getHistroyByNumber($number){
+    public function getHistroyByNumber($number)
+    {
         $person_model = new PersonModel();
-        $list =  $this->where('number',$number)->where('review_steps',4)->select();
+        $list =  $this->where('number', $number)->where('review_steps', 4)->select();
         // return $list[0];
-        foreach($list as $k=>$v){
-            $list[$k]['reason']=$v['reason'] === 1?'转专业':( $v['reason'] === 2?'分配错误修正':'其他');
+        foreach ($list as $k => $v) {
+            $list[$k]['reason'] = $v['reason'] === 1 ? '转专业' : ($v['reason'] === 2 ? '分配错误修正' : '其他');
             $list[$k]['review_steps'] = '转出成功';
 
 
-            $list[$k]['leave_organization']=$v['leave_organization'] == 0?'未选择':$v['leave_organization'];
+            $list[$k]['leave_organization'] = $v['leave_organization'] == 0 ? '未选择' : $v['leave_organization'];
             $list[$k]['leave_faculty_label'] = $person_model->getJsonData('options.json', $v['leave_faculty']);
             $list[$k]['leave_organization_label'] = $person_model->getJsonData('options.json', $v['leave_faculty'], $v['leave_organization'], true);
-            $list[$k]['leave_label'] = $v['leave_faculty_label'].$v['leave_organization_label'];
-    
-    
+            $list[$k]['leave_label'] = $v['leave_faculty_label'] . $v['leave_organization_label'];
+
+
             $list[$k]['receive_faculty_label'] = $person_model->getJsonData('options.json', $v['receive_faculty']);
             $list[$k]['receive_organization_label'] = $person_model->getJsonData('options.json', $v['receive_faculty'], $v['receive_organization'], true);
-            $list[$k]['receive_label'] = $v['receive_faculty_label'].$v['receive_organization_label'];
+            $list[$k]['receive_label'] = $v['receive_faculty_label'] . $v['receive_organization_label'];
         }
 
 
@@ -124,6 +127,17 @@ class Transfer extends Model
             $list['data'][$k]['receive_organization_label'] = $person_model->getJsonData('options.json', $v['receive_faculty'], $v['receive_organization'], true);
         }
         return  $list;
+    }
+
+    //删除申请信息
+    public function deleteTransfer($data)
+    {
+        try {
+            $this->destroy($data['id'],true);  //只允许第二个参数内的值被修改
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
 

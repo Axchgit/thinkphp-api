@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-10 01:40:09
+ * @LastEditTime: 2020-12-13 16:47:25
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -77,6 +77,10 @@ Route::group('admin', function () {
     Route::get('viewApply', 'viewApply')->middleware('checkrequest', 4)->allowCrossDomain();  
     Route::post('reviewApply', 'reviewApply')->middleware('checkrequest', 4)->allowCrossDomain();  
     Route::get('viewRecruit', 'viewRecruit')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::rule('deleteRecruit', 'deleteRecruit')->middleware('checkrequest', 4)->allowCrossDomain();
+
+
+    
     Route::get('viewAllPersonAccount', 'viewAllPersonAccount')->middleware('checkrequest', 4)->allowCrossDomain();
     // Route::post('selectGoods', 'selectGoods')->middleware('checkrequest', 1)->allowCrossDomain();
     //首页charts数据
@@ -97,6 +101,9 @@ Route::group('admin', function () {
     
     Route::get('viewTransferApply', 'viewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
     Route::post('reviewTransferApply', 'reviewTransferApply')->middleware('checkrequest', 4)->allowCrossDomain();
+
+    Route::rule('deleteTransfer', 'deleteTransfer')->middleware('checkrequest', 4)->allowCrossDomain();
+
     //发送通告
     Route::post('sendBulletin', 'sendBulletin')->middleware('checkrequest', 4)->allowCrossDomain();
     //获取文件
