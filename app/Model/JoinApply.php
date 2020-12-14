@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-16 16:28:24
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\JoinApply.php
- * @LastEditTime: 2020-12-05 14:50:13
+ * @LastEditTime: 2020-12-14 17:55:42
  * @LastEditors: 罗曼
  */
 
@@ -89,7 +89,7 @@ class JoinApply extends Model
             ->field('faculty,party_branch')
             // ->field('c.*')
             ->field('d.id,d.step,d.review_status,d.reviewer,d.remarks,d.create_time')
-            ->field('a.number,name,sex,faculty,party_branch')
+            ->field('a.number,name,sex,faculty,party_branch,nation,email,post')
             
             ->fieldRaw('max(case when category=1 then score else "未认证" end) as certificate_one')
             ->fieldRaw('max(case when category=2 then score else "未认证" end) as certificate_two')

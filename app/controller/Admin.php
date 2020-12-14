@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-13 16:21:11
+ * @LastEditTime: 2020-12-14 18:39:33
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -360,6 +360,10 @@ class Admin extends Base
         //根据申请步骤判断审核后操作
         switch ($post['step']) {
             case 1:
+                if ($post['review_status'] != 2) {
+                    $rpm_res=true;
+                    break;
+                }
                 $post['stage'] = 1;
                 $rpm_res = $rpm_model->createRecruit($post);
                 if ($rpm_res === true) {
@@ -369,6 +373,11 @@ class Admin extends Base
                 }
                 break;
             case 2:
+                if ($post['review_status'] != 2) {
+                    $rpm_res=true;
+
+                    break;
+                }
                 $post['stage'] = 4;
                 $rpm_res = $rpm_model->createRecruit($post);
                 if ($rpm_res === true) {
@@ -379,10 +388,14 @@ class Admin extends Base
                 }
                 break;
             case 3:
-                if (!$is_high_admin && $post['review_status'] == 2) {
+                if ($post['review_status'] == 2) {
                     $post['review_status'] = 4;
                     $post['remarks'] = $post['introducer'];
                     $ja_res = $ja_model->updateJoinApply($post);
+                }else{
+                    $rpm_res=true;
+
+                    break;
                 }
                 // else if ($post['review_status'] == 2) {
                 $post['stage'] = 5;
@@ -392,14 +405,18 @@ class Admin extends Base
                 // }
 
             case 4:
-                if (!$is_high_admin && $post['review_status'] == 2) {
+                if ($post['review_status'] == 2) {
                     //申请通过后,修改人员政治面貌
                     $res_person = $person_model->updateByNumber($post['number'], ['political_status' => 3]);
                     if ($res_person !== true) {
                         return $this->create('',  '系统未知错误', 204);
                     }
-                    $post['review_status'] = 4;
+                    // $post['review_status'] = 4;
                     $ja_res = $ja_model->updateJoinApply($post);
+                }else{
+                    $rpm_res=true;
+
+                    break;
                 }
                 $post['stage'] = 6;
                 $rpm_res = $rpm_model->createRecruit($post);
@@ -410,14 +427,18 @@ class Admin extends Base
                 }
                 break;
             case 5:
-                if (!$is_high_admin && $post['review_status'] == 2) {
+                if ($post['review_status'] == 2) {
                     //申请通过后,修改人员政治面貌
                     $res_person = $person_model->updateByNumber($post['number'], ['political_status' => 4]);
                     if ($res_person !== true) {
                         return $this->create('',  '系统未知错误', 204);
                     }
-                    $post['review_status'] = 4;
+                    // $post['review_status'] = 4;
                     $ja_res = $ja_model->updateJoinApply($post);
+                }else{
+                    $rpm_res=true;
+
+                    break;
                 }
                 $post['stage'] = 8;
                 $rpm_res = $rpm_model->createRecruit($post);
@@ -431,10 +452,10 @@ class Admin extends Base
         }
 
         //当审核未通过时,删除发展党员信息
-        if ($post['review_status'] != 2) {
-            $rpm_res = $rpm_model->deleteRecruit([['number', '=', $post['number']], ['stage', '>=', $post['stage']]]);
-            return $this->create($post, $rpm_res);
-        }
+        // if ($post['review_status'] != 2) {
+        //     $rpm_res = $rpm_model->deleteRecruit([['number', '=', $post['number']], ['stage', '>=', $post['stage']]]);
+        //     return $this->create($post, $rpm_res);
+        // }
 
 
 

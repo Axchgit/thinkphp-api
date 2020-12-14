@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-12-13 16:14:38
+ * @LastEditTime: 2020-12-14 18:34:36
  * @LastEditors: 罗曼
  */
 
@@ -43,7 +43,7 @@ class RecruitPartyMember extends Model
     public function deleteRecruit($data)
     {
         try {
-            $this->where($data)->delete();  //只允许第二个参数内的值被修改
+            $this->where($data)->delete();  
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();
