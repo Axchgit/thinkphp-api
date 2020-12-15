@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-14 18:39:33
+ * @LastEditTime: 2020-12-15 17:50:58
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -357,55 +357,43 @@ class Admin extends Base
         $post['remarks'] = '';
         $ja_res = $ja_model->updateJoinApply($post);
         // $post['stage'] = $post['step'] == 1 ? 1 : $post['step'] + 2;
-        //根据申请步骤判断审核后操作
-        switch ($post['step']) {
-            case 1:
-                if ($post['review_status'] != 2) {
-                    $rpm_res=true;
-                    break;
-                }
-                $post['stage'] = 1;
-                $rpm_res = $rpm_model->createRecruit($post);
-                if ($rpm_res === true) {
-                    $post['stage'] = 2;
-                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+3 month"));
+        if ($post['review_status'] == 2) {
+            //根据申请步骤判断审核后操作
+            switch ($post['step']) {
+                case 1:
+                    $post['stage'] = 1;
                     $rpm_res = $rpm_model->createRecruit($post);
-                }
-                break;
-            case 2:
-                if ($post['review_status'] != 2) {
-                    $rpm_res=true;
-
+                    if ($rpm_res === true) {
+                        $post['stage'] = 2;
+                        $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+3 month"));
+                        $rpm_res = $rpm_model->createRecruit($post);
+                    }
                     break;
-                }
-                $post['stage'] = 4;
-                $rpm_res = $rpm_model->createRecruit($post);
-                if ($rpm_res === true) {
-                    $post = array_diff_key($post, ["contacts" => 0, "introducer" => 0]);
-                    $post['stage'] = 3;
-                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("-15 day"));
+                case 2:
+                    $post['stage'] = 4;
                     $rpm_res = $rpm_model->createRecruit($post);
-                }
-                break;
-            case 3:
-                if ($post['review_status'] == 2) {
+                    if ($rpm_res === true) {
+                        $post = array_diff_key($post, ["contacts" => 0, "introducer" => 0]);
+                        $post['stage'] = 3;
+                        $post['stage_time'] = date("Y-m-d H:i:s", strtotime("-15 day"));
+                        $rpm_res = $rpm_model->createRecruit($post);
+                    }
+                    break;
+                case 3:
+                    // if ($post['review_status'] == 2) {
                     $post['review_status'] = 4;
                     $post['remarks'] = $post['introducer'];
                     $ja_res = $ja_model->updateJoinApply($post);
-                }else{
-                    $rpm_res=true;
-
+                    // } 
+                    // else if ($post['review_status'] == 2) {
+                    $post['stage'] = 5;
+                    $post['introducer'] = $introducer;
+                    $rpm_res = $rpm_model->createRecruit($post);
                     break;
-                }
-                // else if ($post['review_status'] == 2) {
-                $post['stage'] = 5;
-                $post['introducer'] = $introducer;
-                $rpm_res = $rpm_model->createRecruit($post);
-                break;
-                // }
+                    // }
 
-            case 4:
-                if ($post['review_status'] == 2) {
+                case 4:
+                    // if ($post['review_status'] == 2) {
                     //申请通过后,修改人员政治面貌
                     $res_person = $person_model->updateByNumber($post['number'], ['political_status' => 3]);
                     if ($res_person !== true) {
@@ -413,21 +401,17 @@ class Admin extends Base
                     }
                     // $post['review_status'] = 4;
                     $ja_res = $ja_model->updateJoinApply($post);
-                }else{
-                    $rpm_res=true;
-
-                    break;
-                }
-                $post['stage'] = 6;
-                $rpm_res = $rpm_model->createRecruit($post);
-                if ($rpm_res === true) {
-                    $post['stage'] = 7;
-                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+7 day"));
+                    // }
+                    $post['stage'] = 6;
                     $rpm_res = $rpm_model->createRecruit($post);
-                }
-                break;
-            case 5:
-                if ($post['review_status'] == 2) {
+                    if ($rpm_res === true) {
+                        $post['stage'] = 7;
+                        $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+7 day"));
+                        $rpm_res = $rpm_model->createRecruit($post);
+                    }
+                    break;
+                case 5:
+                    // if ($post['review_status'] == 2) {
                     //申请通过后,修改人员政治面貌
                     $res_person = $person_model->updateByNumber($post['number'], ['political_status' => 4]);
                     if ($res_person !== true) {
@@ -435,21 +419,23 @@ class Admin extends Base
                     }
                     // $post['review_status'] = 4;
                     $ja_res = $ja_model->updateJoinApply($post);
-                }else{
-                    $rpm_res=true;
-
-                    break;
-                }
-                $post['stage'] = 8;
-                $rpm_res = $rpm_model->createRecruit($post);
-                if ($rpm_res === true) {
-                    $post['stage'] = 9;
-                    $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+7 day"));
+                    // }
+                    $post['stage'] = 8;
                     $rpm_res = $rpm_model->createRecruit($post);
-                }
-                # code...
-                break;
+                    if ($rpm_res === true) {
+                        $post['stage'] = 9;
+                        $post['stage_time'] = date("Y-m-d H:i:s", strtotime("+7 day"));
+                        $rpm_res = $rpm_model->createRecruit($post);
+                    }
+                    # code...
+                    break;
+            }
+        } else {
+            $rpm_res = true;
+            $ja_res === true;
         }
+
+
 
         //当审核未通过时,删除发展党员信息
         // if ($post['review_status'] != 2) {
