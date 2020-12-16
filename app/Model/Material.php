@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-12-10 00:08:52
+ * @LastEditTime: 2020-12-16 18:40:03
  * @LastEditors: 罗曼
  */
 
@@ -38,6 +38,31 @@ class Material extends Model
             return  $e->getMessage();
         }
     }
+    //更新考核成绩
+    public function updateMaterial($data){
+        try {
+            // $data = request()->only(['id', 'role','faculty','party_branch']);
+            $this->update($data, ['id' => $data['id']], ['category', 'serial_number', 'score', 'remarks']);
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    //删除考核成绩
+    public function deleteMaterial($id)
+    {
+        try {
+            //软删除
+            // $this->destroy($id);
+            //真实删除
+            $this->destroy($id,true);
+            return true;
+        } catch (\Exception $e) {
+            return $e;
+        }
+        // $res = $this->save($data);
+    }
+
     //根据学号查询信息
     public function getInfoByNumber($number, $key, $value)
     {
@@ -218,6 +243,45 @@ class Material extends Model
             return [false, $e->getMessage()];
         }
     }
+
+    //获取所有行数据
+    public function getAllList($list_rows, $config, $faculty, $post, $isSimple = false){
+        try {
+            $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
+            $select_post=[];
+            foreach ($post as $k => $v) {
+                $select_post['person.' . $k] = $v;
+                // if ($k == 'faculty') {
+                //     $v > 9 ? $select_post['person.' . $k] = (string)$v : $select_post['person.' . $k] = '0' . (string)$v;
+                // }
+            }
+            $list = Db::table('person')
+            ->alias('a')
+            ->join('material b', 'a.number = b.number')
+
+            ->field('person.name,person.faculty,person.number')
+            ->field('b.*')
+            ->where($select_post)
+            ->order('a.number')
+            ->where('category', '<>', 4)
+            ->whereRaw("faculty='$faculty' or '$faculty' =''")
+            // ->group('person.number')
+            ->paginate($list_rows, $isSimple, $config);
+            // ->each(function ($item, $key) {
+            //     $item['faculty'] = (int)$item['faculty'];
+            //     $item['materialOne']= $item['serial_number_1']>10;
+            //     $item['materialTwo']= $item['serial_number_2']>10;
+            //     $item['materialThree']= $item['serial_number_3']>10;
+            //     return $item;
+            // });
+            return [true, $list];
+
+        } catch (\Exception $e) {
+            return [false, $e->getMessage()];
+        }
+    }
+
+
 
 
 

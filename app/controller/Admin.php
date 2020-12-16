@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-15 17:50:58
+ * @LastEditTime: 2020-12-16 22:25:51
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -473,6 +473,37 @@ class Admin extends Base
         $list = $rpm_model->getRecruit($list_rows, ['query' => $post], $faculty, $post, $role);
         return $this->create($list, '查询成功');
     }
+    //修改发展党员信息
+    public function updateRecruitCI()
+    {
+        $post = request()->param();
+        $rpm_model = new RecruitPartyMemberModel();
+        if (!empty($post['stage3'])) {
+            $post_select = [
+                ['number', '=', $post['number']],
+                ['stage', '=', 4],
+
+            ];
+            $post_update['id'] = $rpm_model->getAllByPost($post_select)['id'];
+            $post_update['contacts'] = $post['contacts'];
+            $res = $rpm_model->updateRecruit($post_update);
+            $post_update = [];
+            // return json([$post_update,$post_select,$res]);
+        }
+        if (!empty($post['stage4'])) {
+            $post_select = [
+                ['number', '=', $post['number']],
+                ['stage', '=', 5],
+            ];
+            $post_update['id'] = $rpm_model->getAllByPost($post_select)['id'];
+            $post_update['introducer'] = $post['introducer'];
+            $res = $rpm_model->updateRecruit($post_update);
+        }
+        if ($res === true) {
+            return $this->create('', '修改成功');
+        }
+        return $this->create($res, '修改失败', 204);
+    }
 
     //删除发展党员信息
     public function deleteRecruit()
@@ -674,6 +705,192 @@ class Admin extends Base
 
 
 
+
+
+
+
+
+
+
+
+
+    /*******
+     * 联表查询信息修改 
+     * */
+
+    //考核成绩
+    public function meterialJoinSelectManage(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $material_model = new MaterialModel();
+
+        if ($role <= 3) {
+            $faculty = '';
+        } else {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
+        }
+
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+
+        $res = $material_model->getAllList($list_rows, ['query' => $post], $faculty, $post);
+        if ($res[0] === true) {
+            return $this->create($res[1], '成功');
+        }
+        return $this->create($res[1], '失败', 204);
+    }
+    //添加考核成绩
+    public function addMeterialJoinSelectManage(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $material_model = new MaterialModel();
+
+        $person_info = $person_model->getAllInfoByNumber($post['number']);
+        // return json($person_info);
+        if ($person_info === null) {
+            return $this->create('', '找不到该学工信息,请检查学工号是否正确', 204);
+        }
+        if ($role === 4) {
+            $admin_faculty = $person_model->getInfoByNumber($number, 'faculty');
+            // $person_faculty = $person_model->getInfoByNumber($post['number'], 'faculty');
+            if ($admin_faculty != $person_info['faculty']) {
+                return $this->create('', '请添加本学院信息', 204);
+            }
+        }
+        $post['remarks'] = !empty($post['remarks']) ? $post['remarks'] : '';
+        $post['serial_number'] = !empty($post['serial_number']) ? $post['serial_number'] : '';
+        $res = $material_model->addMaterial($post['number'], $post['category'], $post['serial_number'], $post['score'], $post['remarks']);
+        if ($res === true) {
+            return $this->create('', '成功');
+        }
+        return $this->create('', $res, 204);
+    }
+
+    //修改考核成绩
+    public function updateMeterialJoinSelectManage()
+    {
+        $post = request()->param();
+        $material_model = new MaterialModel();
+        $res = $material_model->updateMaterial($post);
+        if ($res === true) {
+            return $this->create('', '成功');
+        }
+        return $this->create('', $res, 204);
+    }
+    //删除考核成绩
+    public function deleteMeterialJoinSelectManage()
+    {
+        $post = request()->param();
+        $material_model = new MaterialModel();
+        $res = $material_model->deleteMaterial($post['id']);
+        if ($res === true) {
+            return $this->create('', '成功');
+        }
+        return $this->create('', $res, 204);
+    }
+
+    /********** */
+
+
+
+
+
+
+
+
+
+    
+    /*******发展党员信息*/
+    public function recruitlJoinSelectManage(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $rpm_model = new RecruitPartyMemberModel();
+
+        if ($role <= 3) {
+            $faculty = '';
+        } else {
+            $faculty = $person_model->getInfoByNumber($number, 'faculty');
+        }
+
+        $list_rows = !empty($post['list_rows']) ? $post['list_rows'] : '';
+
+        $res = $rpm_model->getAllList($list_rows, ['query' => $post], $faculty, $post);
+        if ($res[0] === true) {
+            return $this->create($res[1], '成功');
+        }
+        return $this->create($res[1], '失败', 204);
+    }
+    //添加考核成绩
+    public function addRecruitJoinSelectManage(Request $request)
+    {
+        $post = request()->param();
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $role = $tooken_res['data']->role;
+        $person_model = new PersonModel();
+        $material_model = new MaterialModel();
+
+        $person_info = $person_model->getAllInfoByNumber($post['number']);
+        // return json($person_info);
+        if ($person_info === null) {
+            return $this->create('', '找不到该学工信息,请检查学工号是否正确', 204);
+        }
+        if ($role === 4) {
+            $admin_faculty = $person_model->getInfoByNumber($number, 'faculty');
+            // $person_faculty = $person_model->getInfoByNumber($post['number'], 'faculty');
+            if ($admin_faculty != $person_info['faculty']) {
+                return $this->create('', '请添加本学院信息', 204);
+            }
+        }
+        $post['remarks'] = !empty($post['remarks']) ? $post['remarks'] : '';
+        $post['serial_number'] = !empty($post['serial_number']) ? $post['serial_number'] : '';
+        $res = $material_model->addMaterial($post['number'], $post['category'], $post['serial_number'], $post['score'], $post['remarks']);
+        if ($res === true) {
+            return $this->create('', '成功');
+        }
+        return $this->create('', $res, 204);
+    }
+
+    //修改考核成绩
+    public function updateRecruitJoinSelectManage()
+    {
+        $post = request()->param();
+        $material_model = new MaterialModel();
+        $res = $material_model->updateMaterial($post);
+        if ($res === true) {
+            return $this->create('', '成功');
+        }
+        return $this->create('', $res, 204);
+    }
+    //删除考核成绩
+    public function deleteRecruitJoinSelectManage()
+    {
+        $post = request()->param();
+        $material_model = new MaterialModel();
+        $res = $material_model->deleteMaterial($post['id']);
+        if ($res === true) {
+            return $this->create('', '成功');
+        }
+        return $this->create('', $res, 204);
+    }
+
+    /****** */
+
+    /**
+     * 
+     * over
+     */
 
 
 
