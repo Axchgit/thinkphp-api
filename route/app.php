@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-13 16:47:25
+ * @LastEditTime: 2020-12-16 22:29:09
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -112,6 +112,17 @@ Route::group('admin', function () {
     Route::get('deleteFile', 'deleteFile')->middleware('checkrequest', 4)->allowCrossDomain();
 
     
+
+    
+    
+    Route::rule('meterialJoinSelectManage', 'meterialJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::rule('addMeterialJoinSelectManage', 'addMeterialJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::rule('updateMeterialJoinSelectManage', 'updateMeterialJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::rule('deleteMeterialJoinSelectManage', 'deleteMeterialJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
+
+    Route::rule('updateRecruitCI', 'updateRecruitCI')->middleware('checkrequest', 4)->allowCrossDomain();
+
+    Route::rule('recruitlJoinSelectManage', 'recruitlJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
     
     
     
