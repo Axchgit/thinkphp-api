@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-12-16 22:28:22
+ * @LastEditTime: 2020-12-18 02:35:25
  * @LastEditors: 罗曼
  */
 
@@ -44,7 +44,7 @@ class RecruitPartyMember extends Model
     {
         try {
             // $data = request()->only(['id', 'role','faculty','party_branch']);
-            $this->update($data, ['id' => $data['id']], ['contacts', 'introducer']);
+            $this->update($data, ['id' => $data['id']], ['stage_time', 'contacts', 'introducer', 'remarks']);
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -59,6 +59,21 @@ class RecruitPartyMember extends Model
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    //删除考核成绩
+    public function deleteRecruitById($id)
+    {
+        try {
+            //软删除
+            // $this->destroy($id);
+            //真实删除
+            $this->destroy($id, true);
+            return true;
+        } catch (\Exception $e) {
+            return $e;
+        }
+        // $res = $this->save($data);
     }
 
     //发展党员信息
@@ -141,10 +156,11 @@ class RecruitPartyMember extends Model
 
 
     //获取所有行数据
-    public function getAllList($list_rows, $config, $faculty, $post, $isSimple = false){
+    public function getAllList($list_rows, $config, $faculty, $post, $isSimple = false)
+    {
         try {
             $post = array_diff_key($post, ["list_rows" => 0, "page" => 0]);
-            $select_post=[];
+            $select_post = [];
             foreach ($post as $k => $v) {
                 $select_post['person.' . $k] = $v;
                 // if ($k == 'faculty') {
@@ -152,17 +168,17 @@ class RecruitPartyMember extends Model
                 // }
             }
             $list = Db::table('person')
-            ->alias('a')
-            ->join('recruit_party_member b', 'a.number = b.number')
+                ->alias('a')
+                ->join('recruit_party_member b', 'a.number = b.number')
 
-            ->field('person.name,person.faculty,person.number')
-            ->field('b.*')
-            ->where($select_post)
-            ->order('a.number')
-            // ->where('category', '<>', 4)
-            ->whereRaw("faculty='$faculty' or '$faculty' =''")
-            // ->group('person.number')
-            ->paginate($list_rows, $isSimple, $config);
+                ->field('person.name,person.faculty,person.number')
+                ->field('b.*')
+                ->where($select_post)
+                ->order('a.number')
+                // ->where('category', '<>', 4)
+                ->whereRaw("faculty='$faculty' or '$faculty' =''")
+                // ->group('person.number')
+                ->paginate($list_rows, $isSimple, $config);
             // ->each(function ($item, $key) {
             //     $item['faculty'] = (int)$item['faculty'];
             //     $item['materialOne']= $item['serial_number_1']>10;
@@ -171,7 +187,6 @@ class RecruitPartyMember extends Model
             //     return $item;
             // });
             return [true, $list];
-
         } catch (\Exception $e) {
             return [false, $e->getMessage()];
         }

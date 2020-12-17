@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-16 22:25:51
+ * @LastEditTime: 2020-12-18 02:35:32
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -839,7 +839,8 @@ class Admin extends Base
         $number = $tooken_res['data']->uuid;
         $role = $tooken_res['data']->role;
         $person_model = new PersonModel();
-        $material_model = new MaterialModel();
+        $rpm_model = new RecruitPartyMemberModel();
+
 
         $person_info = $person_model->getAllInfoByNumber($post['number']);
         // return json($person_info);
@@ -853,9 +854,12 @@ class Admin extends Base
                 return $this->create('', '请添加本学院信息', 204);
             }
         }
+        // $post['stage_time']=date("Y-m-d H:i:s",$post['stage_time']/1000);
+        
         $post['remarks'] = !empty($post['remarks']) ? $post['remarks'] : '';
-        $post['serial_number'] = !empty($post['serial_number']) ? $post['serial_number'] : '';
-        $res = $material_model->addMaterial($post['number'], $post['category'], $post['serial_number'], $post['score'], $post['remarks']);
+        $post['contacts'] = !empty($post['contacts']) ? $post['contacts'] : '';
+        $post['introducer'] = !empty($post['introducer']) ? $post['introducer'] : '';
+        $res = $rpm_model->createRecruit($post);
         if ($res === true) {
             return $this->create('', '成功');
         }
@@ -866,8 +870,11 @@ class Admin extends Base
     public function updateRecruitJoinSelectManage()
     {
         $post = request()->param();
-        $material_model = new MaterialModel();
-        $res = $material_model->updateMaterial($post);
+        $rpm_model = new RecruitPartyMemberModel();
+
+        // $post['stage_time']=date("Y-m-d H:i:s",$post['stage_time']/1000);
+
+        $res = $rpm_model->updateRecruit($post);
         if ($res === true) {
             return $this->create('', '成功');
         }
@@ -877,8 +884,9 @@ class Admin extends Base
     public function deleteRecruitJoinSelectManage()
     {
         $post = request()->param();
-        $material_model = new MaterialModel();
-        $res = $material_model->deleteMaterial($post['id']);
+        $rpm_model = new RecruitPartyMemberModel();
+
+        $res = $rpm_model->deleteRecruitById($post['id']);
         if ($res === true) {
             return $this->create('', '成功');
         }

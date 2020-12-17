@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-16 22:29:09
+ * @LastEditTime: 2020-12-18 02:24:08
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
@@ -123,8 +123,11 @@ Route::group('admin', function () {
     Route::rule('updateRecruitCI', 'updateRecruitCI')->middleware('checkrequest', 4)->allowCrossDomain();
 
     Route::rule('recruitlJoinSelectManage', 'recruitlJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
-    
-    
+    Route::rule('addRecruitJoinSelectManage', 'addRecruitJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::rule('updateRecruitJoinSelectManage', 'updateRecruitJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
+    Route::rule('deleteRecruitJoinSelectManage', 'deleteRecruitJoinSelectManage')->middleware('checkrequest', 4)->allowCrossDomain();
+
+
     
 })->completeMatch()->prefix('Admin/');
 
