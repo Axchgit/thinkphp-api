@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-18 02:35:32
+ * @LastEditTime: 2020-12-18 16:22:53
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -800,13 +800,6 @@ class Admin extends Base
 
 
 
-
-
-
-
-
-
-    
     /*******发展党员信息*/
     public function recruitlJoinSelectManage(Request $request)
     {

@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Person.php
- * @LastEditTime: 2020-12-06 00:40:57
+ * @LastEditTime: 2020-12-18 16:37:13
  * @LastEditors: 罗曼
  */
 
@@ -67,18 +67,54 @@ class Person extends Base
         }
         return $this->create('', '获取信息失败', 204);
     }
+    //查看我的个人信息
+    public function viewMyPersonalInfo(Request $request)
+    {
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $person_model = new PersonModel();
+        $data = $person_model->getAllInfoByNumber($number);
+        if (!empty($data)) {
+            $list['姓名'] = $data['name'];
+            $list['学工号'] = $data['number'];
+            $list['性别'] = $data['sex'] === 1 ? '男' : '女';
+            $list['职务'] = $data['post'];
+            $list['学历'] = $data['education'];
+
+            $list['班级'] = $data['class'];
+            $list['专业'] = $data['major'];
+            $list['学院'] = $person_model->getJsonData('options.json', $data['faculty']);
+            if ($data['party_branch'] == 0) {
+                $list['所在党支部'] = '未选择';
+            } else {
+                $list['所在党支部'] = $person_model->getJsonData('options.json', $data['faculty'], $data['party_branch'], true);
+            }
+            $political_status_list = ['默认为共青团员', '群众', '共青团员', '预备党员', '正式党员'];
+            $list['政治面貌'] = $political_status_list[$data['political_status']];
+            $list['民族'] = $data['nation'];
+            $list['籍贯地址'] = $data['native_place'];
+            $list['身份证号码'] = $data['id_card'];
+            $list['手机号'] = $data['phone_number'];
+            $list['邮箱'] = $data['email'];
+            $list['备注'] = $data['remarks'];
+            $list['党支部管理员'] = $person_model->getInfoBySelectPost(['role' => 4], ['faculty' => $data['faculty']])['name'];
+            $list['管理员联系方式'] = $person_model->getInfoBySelectPost(['role' => 4], ['faculty' => $data['faculty']])['phone_number'];
+            return $this->create($list, '获取成功');
+        }
+        return $this->create('', '获取信息失败', 204);
+    }
     //获取个人信息
-    public function getMyInfo(Request $request){
+    public function getMyInfo(Request $request)
+    {
         $post = request()->param();
 
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
-        $value = empty($post['value'])?'political_status':$post['value'];
+        $value = empty($post['value']) ? 'political_status' : $post['value'];
 
         $person_model = new PersonModel();
-        $data = $person_model->getInfoByNumber($number,$value);
+        $data = $person_model->getInfoByNumber($number, $value);
         return $this->create($data, '成功');
-
     }
 
     /************激活账号****** */

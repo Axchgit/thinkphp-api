@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Index.php
- * @LastEditTime: 2020-12-04 17:52:55
+ * @LastEditTime: 2020-12-18 16:25:10
  * @LastEditors: 罗曼
  */
 
@@ -29,13 +29,14 @@ use app\model\TempCode as TempCodeModel;
 
 class Index extends Base
 {
+    //获取账户资料
     public function getProfile(Request $request)
     {
         $tooken_res = $request->data;
         $number = $tooken_res['data']->uuid;
         // return $number;
 
-        $person_model = new PersonModel();
+        // $person_model = new PersonModel();
         $lg_model = new LoginRecordModel();
         $pa_model = new PersonAccountModel();
 
@@ -43,6 +44,7 @@ class Index extends Base
         $login_record = $lg_model->selectRecord($number);
         return $this->create(['login_record' => $login_record,'pa_info'=>$pa_info], '查询成功');
     }
+
     //获取未读通告统计
     public function getCountUnreadBulletin(Request $request)
     {
