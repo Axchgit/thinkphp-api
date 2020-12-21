@@ -6,7 +6,7 @@
  * @Author: 罗曼
  * @Date: 2020-12-07 02:56:02
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\DataBack.php
- * @LastEditTime: 2020-12-11 10:17:30
+ * @LastEditTime: 2020-12-20 14:43:46
  * @LastEditors: 罗曼
  */
 
@@ -24,8 +24,9 @@ class DataBack extends Base
     //获取备份文件列表
     public function viewBackupFile()
     {
+        // $dbhost = config('database.connections.mysql.hostname');
         $post = request()->param();
-        $file_path = !empty($post['file_path'])?$post['file_path']:'D:\/backup\/';
+        $file_path = !empty($post['file_path'])?$post['file_path']:config('database.backup.databack_path');
         $res = $this->getDirContent( $file_path);
         if ($res[0] !== true) {
             return $this->create('', '系统错误');
@@ -55,21 +56,6 @@ class DataBack extends Base
         unlink($post['file']);
         return $this->create('', '成功');
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -162,8 +148,9 @@ class DataBack extends Base
 
      *@return {*}
      */
-    public function backupSql($dbname = 'party_api', string $backupFile = '+_+', $mysqldump_path = "D:\/wamp64\/bin\/mysql\/mysql5.7.24\/bin\/")
+    public function backupSql($dbname = 'party_api', string $backupFile = '+_+')
     {
+        $mysqldump_path = config('database.backup.mysql_bin_path');
         // $dbhost = '127.0.0.1';config
         $dbhost = config('database.connections.mysql.hostname');
         $dbuser = config('database.connections.mysql.username');
@@ -171,7 +158,7 @@ class DataBack extends Base
 
         
         if ($backupFile === '+_+') {
-            $backupFile = 'D:/backup/' . $dbname . '_' . date("Y-m-d_His") . '.sql';
+            $backupFile = config('database.backup.databack_path') . $dbname . '_' . date("Y-m-d_His") . '.sql';
         }
         if ($dbpass === '') {
             exec($mysqldump_path . "mysqldump -h $dbhost -u$dbuser  $dbname > $backupFile");
@@ -189,8 +176,9 @@ class DataBack extends Base
 
      *@return {*}
      */
-    public function restoreSql($backupFile, $dbname = 'party_api', $mysqldump_path = "D:\/wamp64\/bin\/mysql\/mysql5.7.24\/bin\/")
+    public function restoreSql($backupFile, $dbname = 'party_api' )
     {
+        $mysqldump_path = config('database.backup.mysql_bin_path');
 
         // $dbhost = '127.0.0.1';config
         $dbhost = config('database.connections.mysql.hostname');
