@@ -4,8 +4,8 @@ declare(strict_types=1);
 /*
  * @Author: xch
  * @Date: 2020-08-19 14:18:43
- * @LastEditTime: 2020-09-23 16:02:50
- * @LastEditors: Chenhao Xing
+ * @LastEditTime: 2021-01-02 21:47:00
+ * @LastEditors: 罗曼
  * @FilePath: \epdemoc:\wamp64\www\api-thinkphp\app\middleware\CheckRequest.php
  * @Description: 
  */
@@ -37,10 +37,12 @@ class CheckRequest extends Base
             return $this->create('', '令牌不存在', 304);
         }
         $res = checkToken($token);
+
         if ($res['code'] == 2) {
             return $this->create('', $res['msg'], 304);
         }
         // return json($res['data']->role);
+        
         if ($res['data']->role > $need_role) {
             return $this->create('', '没有权限', 204);
         };

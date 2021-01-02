@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:34:38
- * @LastEditTime: 2020-11-27 00:02:21
+ * @LastEditTime: 2021-01-02 21:07:45
  * @LastEditors: 罗曼
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Login.php
@@ -160,6 +160,7 @@ class Login extends Base
 
     public function checkPerosnLogin()
     {
+        // return 123;
         //获取请求信息
         $post =  request()->param();
         //实例化模型
@@ -171,7 +172,7 @@ class Login extends Base
         //根据学号从person表里查询数据
         $person_role = $pa_model->getInfoByNumber($person_info['number'], 'role');
         // $person_name = $pa_model->getInfoByNumber($person_info['number'],'name');
-
+        // return 12321;
         //检查是否为空
         if (!empty($person_info) && !empty($person_role)) {
             $token = signToken($person_info['number'], $person_role);
