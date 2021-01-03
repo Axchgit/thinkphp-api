@@ -2,7 +2,7 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-20 14:42:13
+ * @LastEditTime: 2021-01-03 20:27:46
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\config\database.php
  * @Description: 此为生产环境下的配置,开发环境配置在.env中
@@ -72,7 +72,7 @@ return [
     //数据库备份
     'backup'=>[
         //备份文件存储路径
-        'databack_path' => 'E:/backup/',
+        'databack_path' => 'D:/backup/',
         //mysqldump 所在bin目录 mysql也在此处
         'mysql_bin_path'=>'D:/wamp64/bin/mysql/mysql5.7.24/bin/'
     ]

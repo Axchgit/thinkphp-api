@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2020-12-18 16:22:53
+ * @LastEditTime: 2021-01-03 21:54:28
  * @LastEditors: 罗曼
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
@@ -60,6 +60,7 @@ class Admin extends Base
             return $this->create('', $res, 200);
         }
     }
+    
     //浏览考核成绩
     public function viewMaterial(Request $request)
     {
@@ -169,6 +170,9 @@ class Admin extends Base
         $post =  request()->param();
         $person_model = new PersonModel();
         $update_post = array_diff_key($post, ["party_branch" => '&*&*&']);
+        if (!empty($post['faculty'])) {
+            $update_post['faculty'] = $update_post['faculty'] < 10 ? '0' . (string)$post['faculty'] : (string)$post['faculty'];
+        }
         $res = $person_model->updatePerson($update_post);
         if ($res === true) {
             return $this->create('', '修改成功', 200);
