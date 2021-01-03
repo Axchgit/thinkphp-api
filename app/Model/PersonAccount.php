@@ -4,8 +4,8 @@
  * @Author: 罗曼
  * @Date: 2020-09-17 12:09:09
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\PersonAccount.php
- * @LastEditTime: 2020-12-06 00:15:31
- * @LastEditors: 罗曼
+ * @LastEditTime: 2021-01-03 15:38:44
+ * @LastEditors: xch
  */
 
 namespace app\model;
@@ -66,7 +66,7 @@ class PersonAccount extends Model
             $this->where('number', $number)->update($value);
             return true;
         } catch (\Exception $e) {
-            return $e;
+            return $e->getMessage();
         }
     }
     //更新密码

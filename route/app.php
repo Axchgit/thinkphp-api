@@ -2,8 +2,8 @@
 /*
  * @Author: xch
  * @Date: 2020-08-15 11:15:58
- * @LastEditTime: 2020-12-18 16:37:56
- * @LastEditors: 罗曼
+ * @LastEditTime: 2021-01-03 15:37:23
+ * @LastEditors: xch
  * @Description: 
  * @FilePath: \testd:\wamp64\www\thinkphp-api\route\app.php
  */
@@ -49,6 +49,10 @@ Route::group('index', function () {
     Route::get('getProfile', 'getProfile')->middleware('checkrequest', 9)->allowCrossDomain();
     Route::get('getCountUnreadBulletin', 'getCountUnreadBulletin')->middleware('checkrequest', 9)->allowCrossDomain();
     Route::get('sendEmailCode', 'sendEmailCode')->middleware('checkrequest', 9)->allowCrossDomain();
+    Route::rule('uploadAvatar', 'uploadAvatar')->middleware('checkrequest', 9)->allowCrossDomain();
+
+
+    
 
     
 

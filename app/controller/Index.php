@@ -4,8 +4,8 @@
  * @Author: 罗曼
  * @Date: 2020-09-12 02:32:00
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Index.php
- * @LastEditTime: 2020-12-18 16:25:10
- * @LastEditors: 罗曼
+ * @LastEditTime: 2021-01-03 15:41:26
+ * @LastEditors: xch
  */
 
 namespace app\controller;
@@ -42,7 +42,7 @@ class Index extends Base
 
         $pa_info = $pa_model->getAllInfoByNumber($number);
         $login_record = $lg_model->selectRecord($number);
-        return $this->create(['login_record' => $login_record,'pa_info'=>$pa_info], '查询成功');
+        return $this->create(['login_record' => $login_record, 'pa_info' => $pa_info], '查询成功');
     }
 
     //获取未读通告统计
@@ -74,7 +74,7 @@ class Index extends Base
         }
         return $this->create($res[1], '失败', 204);
     }
-        /**
+    /**
      * @description: 发送登录码
      * @param {type} 
      * @return {type} 
@@ -83,7 +83,7 @@ class Index extends Base
     {
         $post =  request()->param();
         $tooken_res = $request->data;
-        
+
         $number = $tooken_res['data']->uuid;
         $person_model = new PersonModel();
         $code_model = new TempCodeModel();
@@ -98,7 +98,7 @@ class Index extends Base
         //删除之前的登录码
         $code_model->deleteCode($number);
         //保存登录码信息到临时表
-        $res =  $code_model->saveCode($number, $log_code,$post['msg'].'验证码');
+        $res =  $code_model->saveCode($number, $log_code, $post['msg'] . '验证码');
         //字符串截取指定片段
         $v_code = substr($log_code, 10, 6);
         //查询账户对应email
@@ -107,7 +107,7 @@ class Index extends Base
         // $person_email = $person_model->getInfoByNumber($post['number'], 'email');
         $title = '验证码';
         // $data = json_decode($string, true);
-        $content=emailHtmlModel($person_info['name'],$v_code,$post['msg'] );
+        $content = emailHtmlModel($person_info['name'], $v_code, $post['msg']);
         // return $this->create($content);
 
         // $content = '你好, <b>' . $person_info['name'] . '</b>管理员! <br/>这是一封来自河池学院党支部的邮件！<br/><span>你正在登录管理员账户,你的验证码是:' . (string)$v_code;
@@ -128,7 +128,30 @@ class Index extends Base
         return $this->create('', $msg, $code);
     }
 
+    //上传头像
+    public function uploadAvatar(Request $request)
+    {
+        $post = request()->param();
+        // return $this->create('', $post, 204);
+        $file = request()->file('img');
+        // return $this->create($file, '上传成功', 200);
 
+        $tooken_res = $request->data;
+        $number = $tooken_res['data']->uuid;
+        $pa_model = new PersonAccountModel();
+
+        try {
+            validate(['file' => ['fileSize:1024000', 'fileExt:jpg,png,gif']])->check(['file' => $file]);
+            $savename = \think\facade\Filesystem::disk('avatar')->putFile('avatar', $file, 'md5');
+            $res = $pa_model->updateByNumber($number, ['id_photo' => $savename]);
+            if ($res === true) {
+                return $this->create($savename, '上传成功', 200);
+            }
+            return $this->create($res, '修改头像失败，数据库出错', 204);
+        } catch (\think\exception\ValidateException $e) {
+            return $this->create('', $e->getMessage(), 204);
+        }
+    }
 
 
 
