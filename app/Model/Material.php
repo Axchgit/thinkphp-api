@@ -4,8 +4,8 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2020-12-16 18:40:03
- * @LastEditors: 罗曼
+ * @LastEditTime: 2021-01-07 00:50:16
+ * @LastEditors: xch
  */
 
 
@@ -207,23 +207,24 @@ class Material extends Model
             //     $faculty = '';
             // }
             // return $select_post;
+            //知识点:查询所有学生的各科成绩,根据学号分组,别忘记max聚合函数
             $list = Db::table('person')
                 ->alias('a')
                 ->join('material b', 'a.number = b.number')
 
-                ->fieldRaw('(case when category=1 then score else "" end) as score_1')
-                ->fieldRaw('(case when category=2 then score else "" end) as score_2')
-                ->fieldRaw('(case when category=3 then score else "" end) as score_3')
+                ->fieldRaw('max(case when category=1 then score else "" end) as score_1')
+                ->fieldRaw('max(case when category=2 then score else "" end) as score_2')
+                ->fieldRaw('max(case when category=3 then score else "" end) as score_3')
 
-                ->fieldRaw('(case when category=1 then serial_number else "" end) as serial_number_1')
-                ->fieldRaw('(case when category=2 then serial_number else "" end) as serial_number_2')
-                ->fieldRaw('(case when category=3 then serial_number else "" end) as serial_number_3')
+                ->fieldRaw('max(case when category=1 then serial_number else "" end) as serial_number_1')
+                ->fieldRaw('max(case when category=2 then serial_number else "" end) as serial_number_2')
+                ->fieldRaw('max(case when category=3 then serial_number else "" end) as serial_number_3')
                 ->field('person.name,person.faculty,person.number')
-
                 ->where($select_post)
                 ->where('category', '<>', 4)
                 ->whereRaw("faculty='$faculty' or '$faculty' =''")
-                // ->group('person.number')
+                ->fieldRaw("avg(score)")
+                ->group('person.number')
                 ->paginate($list_rows, $isSimple, $config)
                 ->each(function ($item, $key) {
                     $item['faculty'] = (int)$item['faculty'];
