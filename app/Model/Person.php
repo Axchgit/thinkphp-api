@@ -2,7 +2,7 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-12-13 15:50:25
+ * @LastEditTime: 2021-01-07 20:16:33
  * @LastEditors: 罗曼
  * @Description: 员工信息
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Person.php
@@ -34,9 +34,10 @@ class Person extends Model
         foreach ($dataArr as $k => $v) {
             $person[$k]['number'] = $v['学工号'];
             $person[$k]['faculty'] = $v['学院'];
-            $person[$k]['major'] = $v['专业'];
-            $person[$k]['grade'] = $v['年级'];
-            $person[$k]['class'] = $v['班级'];
+            // !empty($v['专业'])
+            $person[$k]['major'] = !empty($v['专业']) ? $v['专业'] : '';
+            $person[$k]['grade'] = !empty($v['年级']) ? $v['年级'] : '';
+            $person[$k]['class'] = !empty($v['班级']) ? $v['班级'] : '';
             $person[$k]['name'] = $v['姓名'];
             $person[$k]['sex'] = $v['性别'] === '男' ? 1 : 2;
             $person[$k]['nation'] = $v['民族'];
