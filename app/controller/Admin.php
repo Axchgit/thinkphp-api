@@ -2,8 +2,8 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2021-01-03 21:54:28
- * @LastEditors: 罗曼
+ * @LastEditTime: 2021-01-08 19:25:52
+ * @LastEditors: xch
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
  */
@@ -385,7 +385,7 @@ class Admin extends Base
                     break;
                 case 3:
                     // if ($post['review_status'] == 2) {
-                    $post['review_status'] = 4;
+                    // $post['review_status'] = 4;
                     $post['remarks'] = $post['introducer'];
                     $ja_res = $ja_model->updateJoinApply($post);
                     // } 
