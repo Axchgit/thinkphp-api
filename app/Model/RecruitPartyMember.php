@@ -4,7 +4,7 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\RecruitPartyMember.php
- * @LastEditTime: 2020-12-18 02:35:25
+ * @LastEditTime: 2021-01-09 18:42:01
  * @LastEditors: 罗曼
  */
 
@@ -174,7 +174,7 @@ class RecruitPartyMember extends Model
                 ->field('person.name,person.faculty,person.number')
                 ->field('b.*')
                 ->where($select_post)
-                ->order('a.number')
+                ->order('b.stage_time','desc')
                 // ->where('category', '<>', 4)
                 ->whereRaw("faculty='$faculty' or '$faculty' =''")
                 // ->group('person.number')
