@@ -4,8 +4,8 @@
  * @Author: 罗曼
  * @Date: 2020-10-13 17:12:47
  * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\Material.php
- * @LastEditTime: 2021-01-07 00:50:16
- * @LastEditors: xch
+ * @LastEditTime: 2021-01-09 19:30:01
+ * @LastEditors: 罗曼
  */
 
 
@@ -86,8 +86,9 @@ class Material extends Model
             if ($num < 10) {
                 $num = '0' . (string)$num;
             }
-
+            
             $material[$k]['number'] = $v['学工号'];
+            // return $v['学工号'];
             // $material[$k]['faculty'] = $v['学院代码'];
             // $person[$k]['major'] = $v['专业'];
             $material[$k]['grade'] = $v['年级'];
@@ -225,6 +226,7 @@ class Material extends Model
                 ->whereRaw("faculty='$faculty' or '$faculty' =''")
                 ->fieldRaw("avg(score)")
                 ->group('person.number')
+                ->order('b.create_time','desc')
                 ->paginate($list_rows, $isSimple, $config)
                 ->each(function ($item, $key) {
                     $item['faculty'] = (int)$item['faculty'];
