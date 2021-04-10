@@ -2,10 +2,10 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-15 12:01:16
- * @LastEditTime: 2020-12-04 16:14:06
- * @LastEditors: 罗曼
+ * @LastEditTime: 2021-04-10 23:39:53
+ * @LastEditors: xch
  * @Description: 
- * @FilePath: \testd:\wamp64\www\thinkphp-api\app\Model\TempCode.php
+ * @FilePath: \vue-framed:\wamp64\www\thinkphp-api\app\Model\TempCode.php
  */
 
 namespace app\model;
@@ -39,7 +39,7 @@ class TempCode extends Model
             return false;
         }
     }
-    //获取验证码
+    //根据学号获取验证码
     public function getCodeByNumber($number)
     {
         try {
