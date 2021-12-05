@@ -2,9 +2,9 @@
 /*
  * @Author: 罗曼
  * @Date: 2020-08-17 22:03:01
- * @LastEditTime: 2021-01-08 19:25:52
+ * @LastEditTime: 2021-12-04 16:12:17
  * @LastEditors: xch
- * @FilePath: \testd:\wamp64\www\thinkphp-api\app\controller\Admin.php
+ * @FilePath: \vue-framed:\wamp64\www\thinkphp-api\app\controller\Admin.php
  * @Description: 
  */
 
@@ -922,7 +922,7 @@ class Admin extends Base
 
 
 
-
+//知识点:charts
     /***********首页charts数据*/
     public function getCount(Request $request)
     {
